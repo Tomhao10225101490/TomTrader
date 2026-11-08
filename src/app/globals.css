@@ -1,0 +1,390 @@
+@import "tailwindcss";
+
+/* Dark mode is driven by an explicit class on <html> (user preference wins over
+   the OS), so the `dark:` variant must key off that class, not the media query. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ==========================================================================
+   TomTrader design tokens
+
+   Design philosophy: quiet, precise, elegant, information-first.
+   - neutral palette, hairline borders, no shadows-as-decoration
+   - no gradients, no glass, no glow, no decorative motion
+   - density comes from alignment and type scale, not from shrinking text
+   - colour is data (up/down) or state (focus/alert); it is never decoration
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* surfaces */
+  --t-canvas: #f6f6f4; /* warm neutral page bed */
+  --t-surface: #ffffff;
+  --t-surface-alt: #fafaf8;
+  --t-surface-inset: #f1f1ee;
+  --t-elevated: #ffffff;
+
+  /* structure */
+  --t-line: #e4e4e0;
+  --t-line-strong: #d3d3ce;
+  --t-line-faint: #ededea;
+  --t-scrim: rgba(28, 30, 32, 0.42);
+
+  /* text */
+  --t-ink: #1a1c1e;
+  --t-ink-secondary: #4c5155;
+  --t-ink-muted: #767b80;
+  --t-ink-faint: #9aa0a5;
+  --t-ink-inverse: #f7f7f5;
+
+  /* accent: desaturated steel blue, used sparingly (focus, active nav, links) */
+  --t-accent: #2f5d8a;
+  --t-accent-hover: #26507a;
+  --t-accent-soft: #e8eef5;
+  --t-accent-ink: #ffffff;
+
+  /* Data colours are declared once per light/dark pair, then bound to a
+     convention. Never bind --t-up/--t-down to each other: that is a custom
+     property cycle and the browser drops both. */
+  --tt-green: #177245;
+  --tt-green-soft: #e6f2ea;
+  --tt-green-strong: #125c37;
+  --tt-red: #b0342c;
+  --tt-red-soft: #f8eae8;
+  --tt-red-strong: #8e2a23;
+  --t-flat: #7b8085;
+  --t-flat-soft: #efefec;
+
+  /* semantic state */
+  --t-warn: #8a6414;
+  --t-warn-soft: #f7f0dc;
+  --t-danger: #a82f28;
+  --t-info: #35618a;
+
+  --t-radius: 4px;
+  --t-radius-sm: 3px;
+  --t-radius-lg: 6px;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --t-canvas: #101215;
+  --t-surface: #16191d;
+  --t-surface-alt: #191d22;
+  --t-surface-inset: #131619;
+  --t-elevated: #1d2126;
+
+  --t-line: #262b31;
+  --t-line-strong: #333941;
+  --t-line-faint: #1f242a;
+  --t-scrim: rgba(6, 8, 10, 0.6);
+
+  --t-ink: #e4e7ea;
+  --t-ink-secondary: #b3b9c0;
+  --t-ink-muted: #828a93;
+  --t-ink-faint: #6a727b;
+  --t-ink-inverse: #14171a;
+
+  --t-accent: #6ea3d6;
+  --t-accent-hover: #86b5e2;
+  --t-accent-soft: #1c2833;
+  --t-accent-ink: #0d1116;
+
+  --tt-green: #4cb17c;
+  --tt-green-soft: #16261d;
+  --tt-green-strong: #63c690;
+  --tt-red: #e4695f;
+  --tt-red-soft: #2a1a19;
+  --tt-red-strong: #ef8279;
+  --t-flat: #7d858d;
+  --t-flat-soft: #1b1f23;
+
+  --t-warn: #d0a44a;
+  --t-warn-soft: #241d10;
+  --t-danger: #e4695f;
+  --t-info: #6ea3d6;
+
+}
+
+/* --------------------------------------------------------------------------
+   Price colour convention
+   intl: gains green / losses red.  cn: gains red / losses green (mainland
+   reading). Both are applied by rebinding the same aliases, so any component
+   that renders a change simply uses --t-up / --t-down and inherits the
+   user's convention — including the heatmap ramp.
+   -------------------------------------------------------------------------- */
+:root,
+:root[data-price-convention='intl'] {
+  --t-up: var(--tt-green);
+  --t-up-soft: var(--tt-green-soft);
+  --t-up-strong: var(--tt-green-strong);
+  --t-down: var(--tt-red);
+  --t-down-soft: var(--tt-red-soft);
+  --t-down-strong: var(--tt-red-strong);
+}
+
+:root[data-price-convention='cn'] {
+  --t-up: var(--tt-red);
+  --t-up-soft: var(--tt-red-soft);
+  --t-up-strong: var(--tt-red-strong);
+  --t-down: var(--tt-green);
+  --t-down-soft: var(--tt-green-soft);
+  --t-down-strong: var(--tt-green-strong);
+}
+
+/* --------------------------------------------------------------------------
+   Tailwind v4 token bridge — `@theme inline` keeps the utilities pointing at
+   the CSS variables, so theme switching is a single attribute flip.
+   -------------------------------------------------------------------------- */
+@theme inline {
+  --color-canvas: var(--t-canvas);
+  --color-surface: var(--t-surface);
+  --color-surface-alt: var(--t-surface-alt);
+  --color-surface-inset: var(--t-surface-inset);
+  --color-elevated: var(--t-elevated);
+
+  --color-line: var(--t-line);
+  --color-line-strong: var(--t-line-strong);
+  --color-line-faint: var(--t-line-faint);
+
+  --color-ink: var(--t-ink);
+  --color-ink-secondary: var(--t-ink-secondary);
+  --color-ink-muted: var(--t-ink-muted);
+  --color-ink-faint: var(--t-ink-faint);
+  --color-ink-inverse: var(--t-ink-inverse);
+
+  --color-accent: var(--t-accent);
+  --color-accent-soft: var(--t-accent-soft);
+  --color-accent-ink: var(--t-accent-ink);
+
+  --color-up: var(--t-up);
+  --color-up-soft: var(--t-up-soft);
+  --color-down: var(--t-down);
+  --color-down-soft: var(--t-down-soft);
+  --color-flat: var(--t-flat);
+  --color-flat-soft: var(--t-flat-soft);
+
+  --color-warn: var(--t-warn);
+  --color-warn-soft: var(--t-warn-soft);
+  --color-danger: var(--t-danger);
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, 'Helvetica Neue', Inter,
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  --font-mono:
+    ui-monospace, 'SF Mono', 'Menlo', 'Cascadia Mono', 'Roboto Mono', 'PingFang SC', monospace;
+
+  --radius-app: var(--t-radius);
+  --radius-app-sm: var(--t-radius-sm);
+  --radius-app-lg: var(--t-radius-lg);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+* {
+  /* Hairlines everywhere. Two adjacent borders collapse into one via outline
+     rather than doubling up, which keeps dense tables readable. */
+  border-color: var(--t-line);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--t-canvas);
+  color: var(--t-ink);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'cv02', 'cv03', 'cv04';
+}
+
+/* Numbers must not dance. Every price, percent and volume uses tabular figures. */
+.num,
+table,
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--t-accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--t-accent);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--t-accent-soft);
+  color: var(--t-ink);
+}
+
+/* Thin, neutral scrollbars — they are furniture, not decoration. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--t-line-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--t-line-strong);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--t-ink-faint);
+  background-clip: padding-box;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* ==========================================================================
+   Data-change feedback
+   Only the digits that actually changed are tinted, and only briefly.
+   ========================================================================== */
+
+@keyframes tt-flash-up {
+  0% {
+    background-color: color-mix(in oklab, var(--t-up) 26%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+@keyframes tt-flash-down {
+  0% {
+    background-color: color-mix(in oklab, var(--t-down) 26%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.flash-up {
+  animation: tt-flash-up 900ms ease-out 1;
+  border-radius: 2px;
+}
+.flash-down {
+  animation: tt-flash-down 900ms ease-out 1;
+  border-radius: 2px;
+}
+
+@keyframes tt-pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.pulse-dot {
+  animation: tt-pulse-dot 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash-up,
+  .flash-down,
+  .pulse-dot {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Structural helpers used by dense tables and the app shell
+   ========================================================================== */
+
+.hairline-b {
+  border-bottom: 1px solid var(--t-line);
+}
+.hairline-t {
+  border-top: 1px solid var(--t-line);
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t-ink-muted);
+}
+
+/* Chart containers must never contribute a stray baseline gap. */
+.chart-host {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* The tiny status LED in the top bar. */
+.led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.tape-track {
+  display: flex;
+  width: max-content;
+  animation: tt-tape 90s linear infinite;
+}
+.tape-host:hover .tape-track {
+  animation-play-state: paused;
+}
+@keyframes tt-tape {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tape-track {
+    animation: none;
+  }
+}
+
+/* Hidden side panels must release their grid tracks, not just their contents. */
+.tt-shell-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 768px) { .tt-shell-grid { grid-template-columns: var(--tt-sidebar-width) minmax(0, 1fr); } }
+@media (min-width: 1280px) { .tt-shell-grid { grid-template-columns: var(--tt-sidebar-width) minmax(0, 1fr) var(--tt-panel-width); } }

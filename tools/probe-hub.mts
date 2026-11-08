@@ -1,0 +1,13 @@
+process.env.TOMTRADER_DEMO = '1';
+process.env.TOMTRADER_DB = ':memory:';
+const { attach, detach, hubState, subscribe } = await import('../src/server/realtime');
+const frames: any[] = [];
+attach('probe', (f) => frames.push(f), () => undefined);
+subscribe('probe', ['equity:US:AAPL', 'index:US:^GSPC']);
+await new Promise((r) => setTimeout(r, 4000));
+console.log('state', JSON.stringify(hubState()));
+console.log('frames', frames.length, frames.map((f) => f.type).join(','));
+const st = frames.find((f) => f.type === 'state');
+if (st) console.log('state frame', JSON.stringify(st).slice(0, 400));
+detach('probe');
+process.exit(0);

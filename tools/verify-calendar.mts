@@ -1,0 +1,11 @@
+import { strict as assert } from 'node:assert';
+import { getMarketStatus,planDay } from '../src/server/marketstatus';
+assert.equal(planDay('CNE', '2026-02-23').closure, 'holiday');
+assert.equal(planDay('CNE', '2026-09-25').closure, 'holiday');
+assert.equal(planDay('HKEX', '2026-04-07').closure, 'holiday');
+assert.equal(planDay('HKEX', '2026-12-28').closure, 'none');
+assert.equal(planDay('HKEX', '2026-12-24').segments.length, 1);
+assert.equal(planDay('XETRA', '2026-12-24').closure, 'holiday');
+assert.equal(planDay('XPAF', '2026-11-11').closure, 'none');
+assert.equal(getMarketStatus('CNE', Date.parse('2027-02-08T02:00:00Z')).state, 'unavailable');
+console.log('8 official-calendar regression assertions passed; source links in docs/DATA_ACCURACY.md.');

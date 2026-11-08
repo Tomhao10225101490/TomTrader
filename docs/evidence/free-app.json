@@ -1,0 +1,569 @@
+{
+  "startedAt": 1794104412207,
+  "completedAt": 1794104421262,
+  "base": "http://127.0.0.1:3102",
+  "database": "/Users/a1/Documents/商业项目库/TomTrader/data/free-acceptance-20261108.db",
+  "sseElapsedMs": 238,
+  "frames": [
+    {
+      "type": "state",
+      "at": 1794104412250,
+      "state": {
+        "connectedAt": 1794104412250,
+        "pollingIntervalMs": 15000,
+        "subscribed": 1,
+        "paused": false,
+        "lastRefreshAt": null,
+        "lastErrorAt": null,
+        "lastError": null,
+        "clients": 1
+      }
+    },
+    {
+      "type": "quotes",
+      "at": 1794104412321,
+      "quotes": [
+        {
+          "instrument": {
+            "id": "equity:CN:600519",
+            "displaySymbol": "600519",
+            "vendorSymbol": "600519.SS",
+            "providerSymbols": {
+              "yahoo": "600519.SS",
+              "eastmoney": "em:1.600519"
+            },
+            "name": "Kweichow Moutai",
+            "nameZh": "贵州茅台",
+            "assetType": "equity",
+            "market": "CN",
+            "exchange": "CNE",
+            "currency": "CNY",
+            "sector": "Consumer Staples",
+            "industry": "Baijiu",
+            "aliases": [
+              "茅台"
+            ]
+          },
+          "quote": null,
+          "status": {
+            "exchange": "CNE",
+            "state": "weekend",
+            "nextOpenAt": 1794187800000,
+            "nextCloseAt": 1794195000000,
+            "nextEventLabel": "tomorrow",
+            "isHalfDay": false,
+            "reason": "Weekend",
+            "sessionSource": "calendar"
+          },
+          "issue": null
+        }
+      ]
+    },
+    {
+      "type": "quotes",
+      "at": 1794104412442,
+      "quotes": [
+        {
+          "instrument": {
+            "id": "equity:CN:600519",
+            "displaySymbol": "600519",
+            "vendorSymbol": "600519.SS",
+            "providerSymbols": {
+              "yahoo": "600519.SS",
+              "eastmoney": "em:1.600519"
+            },
+            "name": "Kweichow Moutai",
+            "nameZh": "贵州茅台",
+            "assetType": "equity",
+            "market": "CN",
+            "exchange": "CNE",
+            "currency": "CNY",
+            "sector": "Consumer Staples",
+            "industry": "Baijiu",
+            "aliases": [
+              "茅台"
+            ]
+          },
+          "quote": {
+            "instrumentId": "equity:CN:600519",
+            "last": 1453,
+            "previousClose": 1452,
+            "change": 1,
+            "changePercent": 0.07,
+            "dayHigh": 1457.72,
+            "dayLow": 1436,
+            "open": 1450,
+            "volume": 4284800,
+            "exchangeTimestamp": 1793952699,
+            "receivedAt": 1794104412380,
+            "tier": "unverified",
+            "quality": "cached",
+            "provider": "eastmoney",
+            "session": "regular",
+            "currency": "CNY",
+            "marketCap": 1816368566253,
+            "vendorName": "贵州茅台"
+          },
+          "status": {
+            "exchange": "CNE",
+            "state": "weekend",
+            "nextOpenAt": 1794187800000,
+            "nextCloseAt": 1794195000000,
+            "nextEventLabel": "tomorrow",
+            "isHalfDay": false,
+            "reason": "Weekend",
+            "sessionSource": "calendar"
+          },
+          "issue": null
+        }
+      ]
+    }
+  ],
+  "snapshots": [
+    {
+      "instrument": {
+        "id": "equity:CN:600519",
+        "displaySymbol": "600519",
+        "vendorSymbol": "600519.SS",
+        "providerSymbols": {
+          "yahoo": "600519.SS",
+          "eastmoney": "em:1.600519"
+        },
+        "name": "Kweichow Moutai",
+        "nameZh": "贵州茅台",
+        "assetType": "equity",
+        "market": "CN",
+        "exchange": "CNE",
+        "currency": "CNY",
+        "sector": "Consumer Staples",
+        "industry": "Baijiu",
+        "aliases": [
+          "茅台"
+        ]
+      },
+      "quote": {
+        "instrumentId": "equity:CN:600519",
+        "last": 1453,
+        "previousClose": 1452,
+        "change": 1,
+        "changePercent": 0.07,
+        "dayHigh": 1457.72,
+        "dayLow": 1436,
+        "open": 1450,
+        "volume": 4284800,
+        "exchangeTimestamp": 1793952699,
+        "receivedAt": 1794104412380,
+        "tier": "unverified",
+        "quality": "cached",
+        "provider": "eastmoney",
+        "session": "regular",
+        "currency": "CNY",
+        "marketCap": 1816368566253,
+        "vendorName": "贵州茅台"
+      },
+      "status": {
+        "exchange": "CNE",
+        "state": "weekend",
+        "nextOpenAt": 1794187800000,
+        "nextCloseAt": 1794195000000,
+        "nextEventLabel": "tomorrow",
+        "isHalfDay": false,
+        "reason": "Weekend",
+        "sessionSource": "calendar"
+      },
+      "issue": null
+    },
+    {
+      "instrument": {
+        "id": "equity:HK:00700",
+        "displaySymbol": "00700",
+        "vendorSymbol": "0700.HK",
+        "providerSymbols": {
+          "yahoo": "0700.HK",
+          "eastmoney": "em:116.00700"
+        },
+        "name": "Tencent Holdings",
+        "nameZh": "腾讯控股",
+        "assetType": "equity",
+        "market": "HK",
+        "exchange": "HKEX",
+        "currency": "HKD",
+        "sector": "Communication Services",
+        "industry": "Internet Platforms",
+        "aliases": [
+          "0700",
+          "0700.HK",
+          "腾讯"
+        ]
+      },
+      "quote": {
+        "instrumentId": "equity:HK:00700",
+        "last": 419.8,
+        "previousClose": 430.4,
+        "change": -10.6,
+        "changePercent": -2.46,
+        "dayHigh": 428.6,
+        "dayLow": 416.2,
+        "open": 421,
+        "volume": 29605485,
+        "exchangeTimestamp": 1793952530,
+        "receivedAt": 1794104413335,
+        "tier": "unverified",
+        "quality": "cached",
+        "provider": "eastmoney",
+        "session": "post",
+        "currency": "HKD",
+        "marketCap": 3817092299214,
+        "vendorName": "腾讯控股"
+      },
+      "status": {
+        "exchange": "HKEX",
+        "state": "weekend",
+        "nextOpenAt": 1794187800000,
+        "nextCloseAt": 1794196800000,
+        "nextEventLabel": "tomorrow",
+        "isHalfDay": false,
+        "reason": "Weekend",
+        "sessionSource": "calendar"
+      },
+      "issue": null
+    },
+    {
+      "instrument": {
+        "id": "equity:US:AAPL",
+        "displaySymbol": "AAPL",
+        "vendorSymbol": "AAPL",
+        "providerSymbols": {
+          "yahoo": "AAPL",
+          "eastmoney": "em:105.AAPL"
+        },
+        "name": "Apple",
+        "nameZh": "苹果",
+        "assetType": "equity",
+        "market": "US",
+        "exchange": "XNAS",
+        "currency": "USD",
+        "sector": "Information Technology",
+        "industry": "Consumer Electronics",
+        "aliases": [
+          "AAPL.US"
+        ]
+      },
+      "quote": {
+        "instrumentId": "equity:US:AAPL",
+        "last": 342.37,
+        "previousClose": 344.17,
+        "change": -1.8,
+        "changePercent": -0.52,
+        "dayHigh": 345.79,
+        "dayLow": 338.3,
+        "open": 338.73,
+        "volume": 44703806,
+        "exchangeTimestamp": 1793998800,
+        "receivedAt": 1794104413335,
+        "tier": "unverified",
+        "quality": "cached",
+        "provider": "eastmoney",
+        "session": "regular",
+        "currency": "USD",
+        "marketCap": 4975383151340,
+        "vendorName": "苹果"
+      },
+      "status": {
+        "exchange": "XNAS",
+        "state": "weekend",
+        "nextOpenAt": 1794234600000,
+        "nextCloseAt": 1794258000000,
+        "nextEventLabel": "2026-11-09",
+        "isHalfDay": false,
+        "reason": "Weekend",
+        "sessionSource": "calendar"
+      },
+      "issue": null
+    },
+    {
+      "instrument": {
+        "id": "index:US:^GSPC",
+        "displaySymbol": "^GSPC",
+        "vendorSymbol": "^GSPC",
+        "providerSymbols": {
+          "yahoo": "^GSPC",
+          "eastmoney": "em:100.SPX"
+        },
+        "name": "S&P 500",
+        "nameZh": "标普500",
+        "assetType": "index",
+        "market": "US",
+        "exchange": "XNYS",
+        "currency": "USD",
+        "sector": null,
+        "industry": null,
+        "aliases": [
+          "SPX",
+          "SP500"
+        ]
+      },
+      "quote": {
+        "instrumentId": "index:US:^GSPC",
+        "last": 7376.86,
+        "previousClose": 7353.73,
+        "change": 23.13,
+        "changePercent": 0.31,
+        "dayHigh": 7444.2,
+        "dayLow": 7369.55,
+        "open": 7377.65,
+        "volume": 3407462128,
+        "exchangeTimestamp": 1793998786,
+        "receivedAt": 1794104413335,
+        "tier": "unverified",
+        "quality": "cached",
+        "provider": "eastmoney",
+        "session": "regular",
+        "currency": "USD",
+        "marketCap": null,
+        "vendorName": "标普500"
+      },
+      "status": {
+        "exchange": "XNYS",
+        "state": "weekend",
+        "nextOpenAt": 1794234600000,
+        "nextCloseAt": 1794258000000,
+        "nextEventLabel": "2026-11-09",
+        "isHalfDay": false,
+        "reason": "Weekend",
+        "sessionSource": "calendar"
+      },
+      "issue": null
+    },
+    {
+      "instrument": {
+        "id": "equity:US:BRK-B",
+        "displaySymbol": "BRK-B",
+        "vendorSymbol": "BRK-B",
+        "providerSymbols": {
+          "yahoo": "BRK-B",
+          "eastmoney": "em:106.BRK-B"
+        },
+        "name": "Berkshire Hathaway (Class B)",
+        "nameZh": "伯克希尔·哈撒韦-B",
+        "assetType": "equity",
+        "market": "US",
+        "exchange": "XNYS",
+        "currency": "USD",
+        "sector": "Financials",
+        "industry": "Multi-Line Insurance",
+        "aliases": []
+      },
+      "quote": {
+        "instrumentId": "equity:US:BRK-B",
+        "last": 570.89,
+        "previousClose": 572.33,
+        "change": -1.44,
+        "changePercent": -0.25,
+        "dayHigh": 575.12,
+        "dayLow": 559.61,
+        "open": 562.07,
+        "volume": null,
+        "exchangeTimestamp": 1793999021,
+        "receivedAt": 1794104413457,
+        "tier": "unverified",
+        "quality": "cached",
+        "provider": "tencent",
+        "session": "regular",
+        "currency": "USD",
+        "marketCap": null,
+        "vendorName": "Berkshire Hathaway Inc. New"
+      },
+      "status": {
+        "exchange": "XNYS",
+        "state": "weekend",
+        "nextOpenAt": 1794234600000,
+        "nextCloseAt": 1794258000000,
+        "nextEventLabel": "2026-11-09",
+        "isHalfDay": false,
+        "reason": "Weekend",
+        "sessionSource": "calendar"
+      },
+      "issue": null
+    }
+  ],
+  "histories": [
+    {
+      "id": "equity:CN:600519",
+      "count": 22,
+      "meta": {
+        "currency": "CNY",
+        "exchangeTimezone": "Asia/Shanghai",
+        "lastBarAt": 1793894400,
+        "receivedAt": 1794104415251,
+        "tier": "unverified",
+        "provider": "eastmoney"
+      }
+    },
+    {
+      "id": "equity:HK:00700",
+      "count": 21,
+      "meta": {
+        "currency": "HKD",
+        "exchangeTimezone": "Asia/Hong_Kong",
+        "lastBarAt": 1793894400,
+        "receivedAt": 1794104416254,
+        "tier": "unverified",
+        "provider": "eastmoney"
+      }
+    },
+    {
+      "id": "equity:US:AAPL",
+      "count": 23,
+      "meta": {
+        "currency": "USD",
+        "exchangeTimezone": "America/New_York",
+        "lastBarAt": 1793941200,
+        "receivedAt": 1794104420257,
+        "tier": "unverified",
+        "provider": "eastmoney"
+      }
+    },
+    {
+      "id": "index:US:^GSPC",
+      "count": 23,
+      "meta": {
+        "currency": "USD",
+        "exchangeTimezone": "America/New_York",
+        "lastBarAt": 1793941200,
+        "receivedAt": 1794104421259,
+        "tier": "unverified",
+        "provider": "eastmoney"
+      }
+    }
+  ],
+  "finalStatus": {
+    "cache": {
+      "entries": 15,
+      "byKind": {
+        "bars": 10,
+        "quote": 5
+      },
+      "flights": 0
+    },
+    "providers": [
+      {
+        "provider": "finnhub",
+        "label": "Finnhub API",
+        "ok": false,
+        "lastAttemptAt": null,
+        "lastSuccessAt": null,
+        "lastError": "FINNHUB_API_KEY not configured",
+        "consecutiveErrors": 0,
+        "cooldownMs": 0,
+        "tier": "unverified",
+        "note": "Official keyed API. US equities and ETFs only; account entitlements apply. REST polling, no upstream push. Latency unverified unless configured from account documentation."
+      },
+      {
+        "provider": "yahoo",
+        "label": "Yahoo Finance (public endpoints)",
+        "ok": false,
+        "lastAttemptAt": 1794104412237,
+        "lastSuccessAt": null,
+        "lastError": "rate-limited: 429 Too Many Requests from query1.finance.yahoo.com",
+        "consecutiveErrors": 1,
+        "cooldownMs": 60000,
+        "tier": "unverified",
+        "note": "Unofficial public endpoints. No documented latency or quota. Queue depth 0."
+      },
+      {
+        "provider": "eastmoney",
+        "label": "Eastmoney (public web endpoints)",
+        "ok": true,
+        "lastAttemptAt": 1794104420458,
+        "lastSuccessAt": 1794104421259,
+        "lastError": null,
+        "consecutiveErrors": 0,
+        "cooldownMs": 0,
+        "tier": "unverified",
+        "note": "Public web endpoints for China A-shares and Hong Kong. Volume normalised from 手 to shares."
+      },
+      {
+        "provider": "tencent",
+        "label": "Tencent quote feed (public web endpoint)",
+        "ok": true,
+        "lastAttemptAt": 1794104413335,
+        "lastSuccessAt": 1794104413457,
+        "lastError": null,
+        "consecutiveErrors": 0,
+        "cooldownMs": 0,
+        "tier": "unverified",
+        "note": "Public quote endpoint used as failover. It does not supply volume (units are not documented per market), so volume shows as “—” when Tencent is the only responder."
+      },
+      {
+        "provider": "demo",
+        "label": "Demo generator (not market data)",
+        "ok": false,
+        "lastAttemptAt": null,
+        "lastSuccessAt": null,
+        "lastError": "Demo disabled",
+        "consecutiveErrors": 0,
+        "cooldownMs": 0,
+        "tier": "demo",
+        "note": "Synthetic data. Nothing shown from this provider is real market data."
+      }
+    ],
+    "universe": {
+      "size": 132,
+      "featured": 42,
+      "heatmapPools": [
+        {
+          "key": "US",
+          "size": 32
+        },
+        {
+          "key": "CN",
+          "size": 18
+        },
+        {
+          "key": "HK",
+          "size": 12
+        },
+        {
+          "key": "APAC",
+          "size": 16
+        },
+        {
+          "key": "EU",
+          "size": 8
+        },
+        {
+          "key": "INDICES",
+          "size": 25
+        }
+      ]
+    },
+    "demoMode": false,
+    "hub": {
+      "connectedAt": null,
+      "pollingIntervalMs": 0,
+      "subscribed": 0,
+      "paused": false,
+      "lastRefreshAt": 1794104412442,
+      "lastErrorAt": null,
+      "lastError": null,
+      "clients": 0
+    },
+    "calendarVersion": "2026.11.08",
+    "configuration": {
+      "finnhubConfigured": false,
+      "publicFeedsEnabled": true
+    },
+    "dbPath": "/Users/a1/Documents/商业项目库/TomTrader/data/free-acceptance-20261108.db",
+    "recentEvents": [
+      {
+        "ts": 1794104414017,
+        "provider": "yahoo",
+        "op": "getHistoricalBars",
+        "outcome": "rate-limited",
+        "detail": "429 Too Many Requests from query1.finance.yahoo.com"
+      }
+    ],
+    "generatedAt": 1794104421262
+  }
+}

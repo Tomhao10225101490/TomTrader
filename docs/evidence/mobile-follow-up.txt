@@ -1,0 +1,14 @@
+[WebServer] (node:94190) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:94191) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:94190) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+  ✓  1 [mobile] › tests/e2e/mobile.spec.ts:13:3 › phone › overview: bottom tabs, no sideways scroll, data visible (2.6s)
+  ✓  2 [mobile] › tests/e2e/mobile.spec.ts:26:3 › phone › stock detail: full-width chart, no sideways scroll (458ms)
+  ✓  3 [mobile] › tests/e2e/mobile.spec.ts:36:3 › phone › every other page fits the viewport (4.9s)
+  ✓  4 [mobile] › tests/e2e/mobile.spec.ts:45:3 › phone › the price convention still applies on a narrow screen (329ms)
+
+  4 passed (9.5s)

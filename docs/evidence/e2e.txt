@@ -1,0 +1,60 @@
+
+> tomtrader@1.0.0 test:e2e
+> playwright test
+
+[WebServer] (node:93647) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 44 tests using 1 worker
+
+(node:93648) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:93647) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+  ✓   1 [desktop] › tests/e2e/app.spec.ts:26:3 › market overview › opens the global overview with real index rows, states and sources (1.9s)
+  ✓   2 [desktop] › tests/e2e/app.spec.ts:43:3 › market overview › states are answers, not decoration (422ms)
+  ✓   3 [desktop] › tests/e2e/app.spec.ts:52:3 › market overview › the three panels load independently (387ms)
+  ✓   4 [desktop] › tests/e2e/app.spec.ts:60:3 › market overview › global market clock renders lanes with a next open (353ms)
+  ✓   5 [desktop] › tests/e2e/app.spec.ts:71:3 › search and detail › Ctrl-K finds AAPL with venue metadata and opens a real chart (824ms)
+  ✓   6 [desktop] › tests/e2e/app.spec.ts:95:3 › search and detail › the chart axis and legend agree with the venue time zone (448ms)
+  ✓   7 [desktop] › tests/e2e/app.spec.ts:103:3 › search and detail › switching ranges and chart types re-renders without losing the chart (623ms)
+  ✓   8 [desktop] › tests/e2e/app.spec.ts:117:3 › search and detail › an unknown identifier says so instead of rendering an empty page (316ms)
+  ✓   9 [desktop] › tests/e2e/app.spec.ts:125:3 › watchlist › adds a symbol, keeps it across a reload and removes it (856ms)
+  ✓  10 [desktop] › tests/e2e/app.spec.ts:147:3 › watchlist › creates a new list and switches to it (497ms)
+  ✓  11 [desktop] › tests/e2e/app.spec.ts:164:3 › personalisation › theme, language and price convention persist across a reload (602ms)
+  ✓  12 [desktop] › tests/e2e/app.spec.ts:190:3 › personalisation › the data panel names its providers, tiers and cache state (379ms)
+  ✓  13 [desktop] › tests/e2e/app.spec.ts:201:3 › heatmap, portfolio, alerts, news › heatmap shows sized, coloured tiles and states its coverage (270ms)
+  ✓  14 [desktop] › tests/e2e/app.spec.ts:211:3 › heatmap, portfolio, alerts, news › portfolio: add a holding, see valuation policy, then remove it (781ms)
+  ✓  15 [desktop] › tests/e2e/app.spec.ts:231:3 › heatmap, portfolio, alerts, news › alerts: a live threshold fires and lands in the trigger log (15.7s)
+  ✓  16 [desktop] › tests/e2e/app.spec.ts:252:3 › heatmap, portfolio, alerts, news › a 52-week alert is refused because no fundamentals feed is connected (289ms)
+  ✓  17 [desktop] › tests/e2e/app.spec.ts:261:3 › heatmap, portfolio, alerts, news › news shows source-backed headlines or an explicit offline state (258ms)
+  ✓  18 [desktop] › tests/e2e/app.spec.ts:281:3 › resilience › the API answers, and unknown ids never produce a fake “live” label (140ms)
+  ✓  19 [desktop] › tests/e2e/app.spec.ts:292:3 › resilience › a malformed range is refused rather than silently defaulted (145ms)
+  ✓  20 [desktop] › tests/e2e/app.spec.ts:297:3 › resilience › the status endpoint reports provider health and cache state (132ms)
+  ✓  21 [desktop] › tests/e2e/extended.spec.ts:5:1 › 100-symbol watchlist can be restored and rendered (654ms)
+  ✓  22 [desktop] › tests/e2e/extended.spec.ts:23:1 › alert edits and pause are persisted through the UI (461ms)
+  ✓  23 [desktop] › tests/e2e/extended.spec.ts:46:1 › target viewport widths release hidden side-panel tracks (830ms)
+  ✓  24 [desktop] › tests/e2e/screenshots.spec.ts:39:3 › visual acceptance › 01 global overview — light (2.1s)
+  ✓  25 [desktop] › tests/e2e/screenshots.spec.ts:46:3 › visual acceptance › 02 global overview — dark (2.2s)
+  ✓  26 [desktop] › tests/e2e/screenshots.spec.ts:54:3 › visual acceptance › 03 US stock detail (2.1s)
+  ✓  27 [desktop] › tests/e2e/screenshots.spec.ts:61:3 › visual acceptance › 04 China stock detail (2.0s)
+  ✓  28 [desktop] › tests/e2e/screenshots.spec.ts:67:3 › visual acceptance › 05 candlestick chart with volume (4.2s)
+  ✓  29 [desktop] › tests/e2e/screenshots.spec.ts:79:3 › visual acceptance › 06 watchlist (1.8s)
+  ✓  30 [desktop] › tests/e2e/screenshots.spec.ts:86:3 › visual acceptance › 07 market heatmap (1.7s)
+  ✓  31 [desktop] › tests/e2e/screenshots.spec.ts:93:3 › visual acceptance › 08 global market clock (1.3s)
+  ✓  32 [desktop] › tests/e2e/screenshots.spec.ts:100:3 › visual acceptance › 09 portfolio (3.6s)
+  ✓  33 [desktop] › tests/e2e/screenshots.spec.ts:120:3 › visual acceptance › 10 mobile overview (2.0s)
+  ✓  34 [desktop] › tests/e2e/screenshots.spec.ts:128:3 › visual acceptance › 11 mobile stock detail (2.0s)
+  ✓  35 [desktop] › tests/e2e/screenshots.spec.ts:135:3 › visual acceptance › 12 settings (1.7s)
+  ✓  36 [desktop] › tests/e2e/screenshots.spec.ts:142:3 › visual acceptance › 13 Chinese interface (2.3s)
+  ✓  37 [desktop] › tests/e2e/screenshots.spec.ts:151:3 › visual acceptance › 14 red-up price convention (2.1s)
+  ✓  38 [desktop] › tests/e2e/screenshots.spec.ts:161:3 › visual acceptance › 15 news and market wire (1.5s)
+  ✓  39 [desktop] › tests/e2e/screenshots.spec.ts:168:3 › visual acceptance › 16 markets reference table (1.9s)
+  ✓  40 [desktop] › tests/e2e/screenshots.spec.ts:175:3 › visual acceptance › 17 alerts (1.7s)
+(node:93977) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  41 [mobile] › tests/e2e/mobile.spec.ts:13:3 › phone › overview: bottom tabs, no sideways scroll, data visible (372ms)
+  ✓  42 [mobile] › tests/e2e/mobile.spec.ts:26:3 › phone › stock detail: full-width chart, no sideways scroll (322ms)
+  ✓  43 [mobile] › tests/e2e/mobile.spec.ts:36:3 › phone › every other page fits the viewport (4.9s)
+  ✓  44 [mobile] › tests/e2e/mobile.spec.ts:45:3 › phone › the price convention still applies on a narrow screen (371ms)
+
+  44 passed (1.2m)

@@ -1,0 +1,20 @@
+# dependencies & build output
+node_modules/
+.next/
+out/
+
+# local runtime data (SQLite databases, incl. WAL/SHM)
+data/
+
+# test artifacts
+playwright-report/
+test-results/
+tsconfig.tsbuildinfo
+
+# local environment & secrets
+.env.local
+.env*.local
+
+# misc
+.DS_Store
+*.log

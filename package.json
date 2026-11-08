@@ -1,0 +1,48 @@
+{
+  "name": "tomtrader",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TomTrader \u2014 Global Markets, One View. Real-time global market terminal.",
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 3100",
+    "build": "next build",
+    "start": "next start -H 127.0.0.1 -p 3100",
+    "lint": "eslint src tests tools",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "screenshots": "playwright test tests/e2e/screenshots.spec.ts",
+    "verify:universe": "tsx tools/verify-universe.mts",
+    "verify:calendar": "tsx tools/verify-calendar.mts",
+    "bench": "tsx tools/bench.mts",
+    "verify:free-feeds": "tsx tools/verify-free-feeds.mts"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
+    "lightweight-charts": "^5.2.1",
+    "lucide-react": "^1.70.0",
+    "next": "16.4.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "tailwind-merge": "^3.4.0",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.5",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.1.0"
+  }
+}

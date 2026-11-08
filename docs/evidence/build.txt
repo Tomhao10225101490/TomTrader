@@ -1,0 +1,76 @@
+
+> tomtrader@1.0.0 build
+> next build
+
+▲ Next.js 16.4.5 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 12ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 419ms
+  Running TypeScript ...
+  Finished TypeScript in 1100ms ...
+  Collecting page data using 9 workers ...
+(node:94061) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94062) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94059) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94060) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94063) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94056) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94057) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94058) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94055) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+  Generating static pages using 9 workers (0/14) ...
+  Generating static pages using 9 workers (3/14) 
+  Generating static pages using 9 workers (6/14) 
+  Generating static pages using 9 workers (10/14) 
+✓ Generating static pages using 9 workers (14/14) in 142ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /alerts
+├ ƒ /api/alerts
+├ ƒ /api/bars
+├ ƒ /api/clock
+├ ƒ /api/detail
+├ ƒ /api/fx
+├ ƒ /api/heatmap
+├ ƒ /api/markets
+├ ƒ /api/movers
+├ ƒ /api/news
+├ ƒ /api/overview
+├ ƒ /api/portfolio
+├ ƒ /api/quotes
+├ ƒ /api/resolve
+├ ƒ /api/search
+├ ƒ /api/sparkline
+├ ƒ /api/status
+├ ƒ /api/stream
+├ ƒ /api/stream/state
+├ ƒ /api/watchlist
+├ ○ /clock
+├ ○ /explore
+├ ○ /heatmap
+├ ○ /markets
+├ ○ /news
+├ ○ /portfolio
+├ ○ /search
+├ ○ /settings
+├ ƒ /stocks/[symbol]
+└ ○ /watchlist
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

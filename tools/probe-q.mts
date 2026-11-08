@@ -1,0 +1,11 @@
+process.env.TOMTRADER_DEMO = '1';
+process.env.TOMTRADER_DB = ':memory:';
+const svc = await import('../src/server/service');
+console.log('demo mode?', svc.isDemoMode());
+const t0 = Date.now();
+const snaps = await svc.getSnapshots(['equity:US:AAPL'], { mode: 'stale' });
+console.log('getSnapshots took', Date.now() - t0, 'ms; n =', snaps.length, 'quote?', Boolean(snaps[0]?.quote));
+const t1 = Date.now();
+const r = await svc.refreshQuotes(['equity:US:AAPL']);
+console.log('refreshQuotes took', Date.now() - t1, 'ms; quotes =', r.quotes.size, 'issues =', r.issues.size);
+process.exit(0);

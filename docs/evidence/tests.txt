@@ -1,0 +1,50 @@
+
+> tomtrader@1.0.0 test
+> vitest run --reporter=default --reporter=json --outputFile=docs/evidence/vitest.json
+
+
+ RUN  v5.1.0 /Users/a1/Documents/商业项目库/TomTrader
+
+(node:93860) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93866) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93864) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ tests/unit/format.test.ts (17 tests) 27ms
+ ✓ tests/unit/marketstatus.test.ts (17 tests) 39ms
+ ✓ tests/unit/parsers.test.ts (8 tests) 18ms
+ ✓ tests/unit/cache.test.ts (11 tests) 66ms
+ ✓ tests/unit/db-isolation.test.ts (1 test) 102ms
+(node:93862) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ tests/unit/regressions.test.ts (9 tests) 19ms
+(node:93871) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ tests/unit/free-feeds.test.ts (5 tests) 17ms
+ ✓ tests/unit/userdata.test.ts (12 tests) 17ms
+ ✓ tests/integration/providers.test.ts (14 tests | 12 skipped) 7ms
+ ✓ tests/unit/treemap.test.ts (10 tests) 4ms
+(node:93873) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ tests/unit/alerts.test.ts (9 tests) 5ms
+ ✓ tests/unit/vendorsymbols.test.ts (8 tests) 3ms
+ ✓ tests/unit/freshness.test.ts (11 tests) 3ms
+ ✓ tests/integration/api.test.ts (25 tests) 183ms
+ ✓ tests/unit/fx-direction.test.ts (1 test) 2ms
+ ✓ tests/unit/http.test.ts (13 tests) 2359ms
+   ✓ outbound http (10)
+     ✓ retries a 5xx and succeeds when the origin recovers 908ms
+     ✓ aborts at its own deadline 405ms
+   ✓ free-feed request scheduling regressions (3)
+     ✓ drains multiple queued histories without waiters blocking one another 1007ms
+ ✓ tests/integration/realtime.test.ts (4 tests) 6110ms
+   ✓ stream hub (4)
+     ✓ attaches a client, subscribes ids and pushes only changes 6107ms
+
+ Test Files  17 passed (17)
+      Tests  163 passed | 12 skipped (175)
+   Start at  10:23:20
+   Duration  6.36s (tests 90%, transform 5%, import 4%, worker 1%)
+
+JSON report written to /Users/a1/Documents/商业项目库/TomTrader/docs/evidence/vitest.json

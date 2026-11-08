@@ -1,0 +1,40 @@
+(node:92719) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+eastmoney: 89/98 quotes
+tencent: 79/79 quotes
+equity:CN:600519 1D: 48 bars
+equity:CN:600519 5D: 80 bars
+equity:CN:600519 1M: 22 bars
+equity:CN:600519 1Y: 241 bars
+equity:HK:00700 1D: 66 bars
+equity:HK:00700 5D: 110 bars
+equity:HK:00700 1M: 21 bars
+equity:HK:00700 1Y: 245 bars
+equity:US:AAPL 1D: 61 bars
+equity:US:AAPL 5D: 125 bars
+equity:US:AAPL 1M: 23 bars
+equity:US:AAPL 1Y: 251 bars
+index:US:^GSPC 1M: 23 bars
+index:US:^IXIC 1M: 23 bars
+index:US:^DJI 1M: 23 bars
+index:CN:000001 1M: 22 bars
+index:CN:399001 1M: 22 bars
+index:CN:399006 1M: 22 bars
+index:CN:000300 1M: 22 bars
+index:CN:000688 1M: 22 bars
+index:HK:^HSI 1M: 21 bars
+index:HK:^HSTECH 1M: 21 bars
+index:JP:^N225 1M: 20 bars
+index:KR:^KS11 1M: 21 bars
+index:TW:^TWII 1M: 19 bars
+index:EU:^SXXP 1M: 22 bars
+index:EU:^STOXX 1M: 22 bars
+index:DE:^GDAXI 1M: 22 bars
+index:GB:^FTSE 1M: 22 bars
+index:FR:^FCHI 1M: 22 bars
+index:AU:^AXJO 1M: 22 bars
+index:IN:^BSESN 1M: 21 bars
+index:BR:^BVSP 1M: 21 bars
+{"coverage":[{"market":"CN","requested":20,"available":20,"missing":[]},{"market":"HK","requested":13,"available":13,"missing":[]},{"market":"US","requested":49,"available":43,"missing":["currency:US:EURUSD=X","currency:US:USDJPY=X","currency:US:GBPUSD=X","currency:US:USDCNY=X","currency:US:USDHKD=X","currency:US:USDKRW=X"]},{"market":"indices","requested":26,"available":22,"missing":["index:US:^RUT","index:US:^VIX","index:JP:^TPX","index:IN:^NSEI"]}],"historiesPassed":33,"historiesRequested":33}
+
+Coverage grouping clarification: US equity/ETF coverage = 38/38; five commodity quotes are separate. Six FX trading quotes remain unavailable. See structured free-feeds.json for grouped coverage and full raw quote rows.

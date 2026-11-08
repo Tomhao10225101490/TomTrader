@@ -1,0 +1,5 @@
+
+> tomtrader@1.0.0 verify:calendar
+> tsx tools/verify-calendar.mts
+
+8 official-calendar regression assertions passed; source links in docs/DATA_ACCURACY.md.

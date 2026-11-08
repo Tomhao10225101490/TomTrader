@@ -1,0 +1,508 @@
+{
+  "recordedAt": "2026-11-08T02:25:43.113Z",
+  "base": "http://127.0.0.1:3102",
+  "mode": "keyless local personal feeds, no demo",
+  "configuration": {
+    "finnhubConfigured": false,
+    "publicFeedsEnabled": true
+  },
+  "snapshots": {
+    "snapshots": [
+      {
+        "instrument": {
+          "id": "equity:US:AAPL",
+          "displaySymbol": "AAPL",
+          "vendorSymbol": "AAPL",
+          "providerSymbols": {
+            "yahoo": "AAPL",
+            "eastmoney": "em:105.AAPL"
+          },
+          "name": "Apple",
+          "nameZh": "苹果",
+          "assetType": "equity",
+          "market": "US",
+          "exchange": "XNAS",
+          "currency": "USD",
+          "sector": "Information Technology",
+          "industry": "Consumer Electronics",
+          "aliases": [
+            "AAPL.US"
+          ]
+        },
+        "quote": {
+          "instrumentId": "equity:US:AAPL",
+          "last": 342.37,
+          "previousClose": 344.17,
+          "change": -1.8,
+          "changePercent": -0.52,
+          "dayHigh": 345.79,
+          "dayLow": 338.3,
+          "open": 338.73,
+          "volume": 44703806,
+          "exchangeTimestamp": 1793998800,
+          "receivedAt": 1794104727424,
+          "tier": "unverified",
+          "quality": "cached",
+          "provider": "eastmoney",
+          "session": "regular",
+          "currency": "USD",
+          "marketCap": 4975383151340,
+          "vendorName": "苹果"
+        },
+        "status": {
+          "exchange": "XNAS",
+          "state": "weekend",
+          "nextOpenAt": 1794234600000,
+          "nextCloseAt": 1794258000000,
+          "nextEventLabel": "2026-11-09",
+          "isHalfDay": false,
+          "reason": "Weekend",
+          "sessionSource": "calendar"
+        },
+        "issue": null
+      },
+      {
+        "instrument": {
+          "id": "equity:CN:600519",
+          "displaySymbol": "600519",
+          "vendorSymbol": "600519.SS",
+          "providerSymbols": {
+            "yahoo": "600519.SS",
+            "eastmoney": "em:1.600519"
+          },
+          "name": "Kweichow Moutai",
+          "nameZh": "贵州茅台",
+          "assetType": "equity",
+          "market": "CN",
+          "exchange": "CNE",
+          "currency": "CNY",
+          "sector": "Consumer Staples",
+          "industry": "Baijiu",
+          "aliases": [
+            "茅台"
+          ]
+        },
+        "quote": {
+          "instrumentId": "equity:CN:600519",
+          "last": 1453,
+          "previousClose": 1452,
+          "change": 1,
+          "changePercent": 0.07,
+          "dayHigh": 1457.72,
+          "dayLow": 1436,
+          "open": 1450,
+          "volume": 4284800,
+          "exchangeTimestamp": 1793952699,
+          "receivedAt": 1794104733332,
+          "tier": "unverified",
+          "quality": "cached",
+          "provider": "eastmoney",
+          "session": "regular",
+          "currency": "CNY",
+          "marketCap": 1816368566253,
+          "vendorName": "贵州茅台"
+        },
+        "status": {
+          "exchange": "CNE",
+          "state": "weekend",
+          "nextOpenAt": 1794187800000,
+          "nextCloseAt": 1794195000000,
+          "nextEventLabel": "tomorrow",
+          "isHalfDay": false,
+          "reason": "Weekend",
+          "sessionSource": "calendar"
+        },
+        "issue": null
+      },
+      {
+        "instrument": {
+          "id": "index:US:^GSPC",
+          "displaySymbol": "^GSPC",
+          "vendorSymbol": "^GSPC",
+          "providerSymbols": {
+            "yahoo": "^GSPC",
+            "eastmoney": "em:100.SPX"
+          },
+          "name": "S&P 500",
+          "nameZh": "标普500",
+          "assetType": "index",
+          "market": "US",
+          "exchange": "XNYS",
+          "currency": "USD",
+          "sector": null,
+          "industry": null,
+          "aliases": [
+            "SPX",
+            "SP500"
+          ]
+        },
+        "quote": {
+          "instrumentId": "index:US:^GSPC",
+          "last": 7376.86,
+          "previousClose": 7353.73,
+          "change": 23.13,
+          "changePercent": 0.31,
+          "dayHigh": 7444.2,
+          "dayLow": 7369.55,
+          "open": 7377.65,
+          "volume": 3407462128,
+          "exchangeTimestamp": 1793998786,
+          "receivedAt": 1794104731330,
+          "tier": "unverified",
+          "quality": "cached",
+          "provider": "eastmoney",
+          "session": "regular",
+          "currency": "USD",
+          "marketCap": null,
+          "vendorName": "标普500"
+        },
+        "status": {
+          "exchange": "XNYS",
+          "state": "weekend",
+          "nextOpenAt": 1794234600000,
+          "nextCloseAt": 1794258000000,
+          "nextEventLabel": "2026-11-09",
+          "isHalfDay": false,
+          "reason": "Weekend",
+          "sessionSource": "calendar"
+        },
+        "issue": null
+      }
+    ],
+    "generatedAt": 1794104743112
+  },
+  "records": [
+    {
+      "file": "01-global-overview-light.png",
+      "route": "/",
+      "elapsedMsIncluding700msSettle": 932.786458,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": false,
+      "qualities": [
+        "cached",
+        "cached",
+        "cached",
+        "unavailable",
+        "unavailable",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "unavailable",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "unavailable",
+        "cached",
+        "cached"
+      ]
+    },
+    {
+      "file": "02-global-overview-dark.png",
+      "route": "/",
+      "elapsedMsIncluding700msSettle": 822.5187079999996,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": false,
+      "qualities": [
+        "cached",
+        "cached",
+        "cached",
+        "unavailable",
+        "unavailable",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "unavailable",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "unavailable",
+        "cached",
+        "cached"
+      ]
+    },
+    {
+      "file": "03-us-stock-detail.png",
+      "route": "/stocks/equity%3AUS%3AAAPL",
+      "elapsedMsIncluding700msSettle": 848.5431670000003,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": true,
+      "qualities": [
+        "cached"
+      ]
+    },
+    {
+      "file": "04-china-stock-detail.png",
+      "route": "/stocks/equity%3ACN%3A600519",
+      "elapsedMsIncluding700msSettle": 5071.643125,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": true,
+      "qualities": [
+        "cached"
+      ]
+    },
+    {
+      "file": "05-candlestick-chart.png",
+      "route": "/stocks/equity%3AUS%3ANVDA",
+      "elapsedMsIncluding700msSettle": 772.2527500000015,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": true,
+      "qualities": [
+        "cached"
+      ]
+    },
+    {
+      "file": "06-watchlist.png",
+      "route": "/watchlist",
+      "elapsedMsIncluding700msSettle": 747.891708000001,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": false,
+      "qualities": [
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "unavailable"
+      ]
+    },
+    {
+      "file": "07-market-heatmap.png",
+      "route": "/heatmap",
+      "elapsedMsIncluding700msSettle": 733.1057920000003,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": false,
+      "qualities": []
+    },
+    {
+      "file": "08-global-market-clock.png",
+      "route": "/clock",
+      "elapsedMsIncluding700msSettle": 744.4769589999996,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": false,
+      "qualities": []
+    },
+    {
+      "file": "09-portfolio.png",
+      "route": "/portfolio",
+      "elapsedMsIncluding700msSettle": 735.5954579999998,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": false,
+      "qualities": []
+    },
+    {
+      "file": "10-mobile-overview.png",
+      "route": "/",
+      "elapsedMsIncluding700msSettle": 777.3142079999998,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": false,
+      "qualities": [
+        "cached",
+        "cached",
+        "cached",
+        "unavailable",
+        "unavailable",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "unavailable",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "cached",
+        "unavailable",
+        "cached",
+        "cached"
+      ]
+    },
+    {
+      "file": "11-mobile-stock-detail.png",
+      "route": "/stocks/equity%3AUS%3AAAPL",
+      "elapsedMsIncluding700msSettle": 764.2005410000002,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": true,
+      "qualities": [
+        "cached"
+      ]
+    },
+    {
+      "file": "12-settings.png",
+      "route": "/settings",
+      "elapsedMsIncluding700msSettle": 754.9538329999996,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": 0,
+      "chartPresent": false,
+      "qualities": []
+    }
+  ],
+  "viewportChecks": [
+    {
+      "width": 1920,
+      "height": 1080,
+      "mainWidth": 1408,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "mainWidth": 928,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "mainWidth": 768,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "mainWidth": 572,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "mainWidth": 390,
+      "horizontalOverflow": 0
+    }
+  ],
+  "chartChecks": [
+    {
+      "id": "equity:CN:600519",
+      "range": "1D",
+      "caption": "600519 1D chart, 59 bars"
+    },
+    {
+      "id": "equity:CN:600519",
+      "range": "5D",
+      "caption": "600519 5D chart, 48 bars"
+    },
+    {
+      "id": "equity:CN:600519",
+      "range": "1M",
+      "caption": "600519 1M chart, 80 bars"
+    },
+    {
+      "id": "equity:CN:600519",
+      "range": "1Y",
+      "caption": "600519 1Y chart, 22 bars"
+    },
+    {
+      "id": "equity:HK:00700",
+      "range": "1D",
+      "caption": "00700 1D chart, 63 bars"
+    },
+    {
+      "id": "equity:HK:00700",
+      "range": "5D",
+      "caption": "00700 5D chart, 66 bars"
+    },
+    {
+      "id": "equity:HK:00700",
+      "range": "1M",
+      "caption": "00700 1M chart, 110 bars"
+    },
+    {
+      "id": "equity:HK:00700",
+      "range": "1Y",
+      "caption": "00700 1Y chart, 21 bars"
+    },
+    {
+      "id": "equity:US:AAPL",
+      "range": "1D",
+      "caption": "AAPL 1D chart, 65 bars"
+    },
+    {
+      "id": "equity:US:AAPL",
+      "range": "5D",
+      "caption": "AAPL 5D chart, 61 bars"
+    },
+    {
+      "id": "equity:US:AAPL",
+      "range": "1M",
+      "caption": "AAPL 1M chart, 125 bars"
+    },
+    {
+      "id": "equity:US:AAPL",
+      "range": "1Y",
+      "caption": "AAPL 1Y chart, 23 bars"
+    }
+  ],
+  "pageErrors": []
+}

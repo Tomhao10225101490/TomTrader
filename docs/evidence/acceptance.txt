@@ -1,0 +1,12 @@
+Captured 01-global-overview-light
+Captured 02-global-overview-dark
+Captured 03-us-stock-detail
+Captured 04-china-stock-detail
+Captured 05-candlestick-chart
+Captured 06-watchlist
+Captured 07-market-heatmap
+Captured 08-global-market-clock
+Captured 09-portfolio
+Captured 10-mobile-overview
+Captured 11-mobile-stock-detail
+Captured 12-settings

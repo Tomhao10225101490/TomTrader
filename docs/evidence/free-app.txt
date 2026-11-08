@@ -1,0 +1,2 @@
+Fresh cold-start SSE quote in 238ms
+Production APIs passed: 5 fresh quotes, 4 charts, Tencent fallback, cold-start SSE

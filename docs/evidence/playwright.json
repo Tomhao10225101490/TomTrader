@@ -1,0 +1,1801 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/Users/a1/Documents/商业项目库/TomTrader/node_modules/.bin/playwright",
+      "test"
+    ],
+    "configFile": "/Users/a1/Documents/商业项目库/TomTrader/playwright.config.ts",
+    "rootDir": "/Users/a1/Documents/商业项目库/TomTrader/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/a1/Documents/商业项目库/TomTrader/test-results/e2e",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/Users/a1/Documents/商业项目库/TomTrader/tests/e2e",
+        "testIgnore": [
+          "/mobile\\.spec\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 90000
+      },
+      {
+        "outputDir": "/Users/a1/Documents/商业项目库/TomTrader/test-results/e2e",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile",
+        "name": "mobile",
+        "testDir": "/Users/a1/Documents/商业项目库/TomTrader/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/mobile\\.spec\\.ts/"
+        ],
+        "timeout": 90000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/a1/Documents/商业项目库/TomTrader/test-results/e2e",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "desktop",
+        "testDir": "/Users/a1/Documents/商业项目库/TomTrader/tests/e2e",
+        "snapshotDir": "/Users/a1/Documents/商业项目库/TomTrader/tests/e2e",
+        "testIgnore": {},
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 90000,
+        "use": {
+          "baseURL": "http://127.0.0.1:3101",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "channel": "chrome",
+          "locale": "en-US",
+          "timezoneId": "Asia/Shanghai",
+          "launchOptions": {
+            "args": [
+              "--no-proxy-server"
+            ]
+          },
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.8127.18 Safari/537.36",
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/a1/Documents/商业项目库/TomTrader/test-results/e2e",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "mobile",
+        "testDir": "/Users/a1/Documents/商业项目库/TomTrader/tests/e2e",
+        "snapshotDir": "/Users/a1/Documents/商业项目库/TomTrader/tests/e2e",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 90000,
+        "use": {
+          "baseURL": "http://127.0.0.1:3101",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "channel": "chrome",
+          "locale": "en-US",
+          "timezoneId": "Asia/Shanghai",
+          "launchOptions": {
+            "args": [
+              "--no-proxy-server"
+            ]
+          },
+          "userAgent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.8127.18 Mobile Safari/537.36",
+          "screen": {
+            "width": 393,
+            "height": 851
+          },
+          "deviceScaleFactor": 2.75,
+          "isMobile": true,
+          "hasTouch": true,
+          "defaultBrowserType": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "mobile"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "docs/evidence/playwright.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "open": "never",
+          "outputFolder": "playwright-report"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.0",
+    "workers": 1,
+    "webServer": {
+      "command": "node tools/e2e-server.mjs",
+      "url": "http://127.0.0.1:3101",
+      "reuseExistingServer": false,
+      "timeout": 300000,
+      "env": {
+        "TOMTRADER_DB": "/Users/a1/Documents/商业项目库/TomTrader/test-results/e2e.db",
+        "TOMTRADER_DEMO": "1",
+        "TOMTRADER_PUBLIC_FEEDS": "0"
+      },
+      "stdout": "ignore",
+      "stderr": "pipe"
+    }
+  },
+  "suites": [
+    {
+      "title": "app.spec.ts",
+      "file": "app.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "market overview",
+          "file": "app.spec.ts",
+          "line": 25,
+          "column": 6,
+          "specs": [
+            {
+              "title": "opens the global overview with real index rows, states and sources",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1869,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:46.036Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-e986e9bc4171a71f5395",
+              "file": "app.spec.ts",
+              "line": 26,
+              "column": 3
+            },
+            {
+              "title": "states are answers, not decoration",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 422,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:48.128Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-c8386ce68f63abf817bd",
+              "file": "app.spec.ts",
+              "line": 43,
+              "column": 3
+            },
+            {
+              "title": "the three panels load independently",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 387,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:48.560Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-6449d15466415ba49c1d",
+              "file": "app.spec.ts",
+              "line": 52,
+              "column": 3
+            },
+            {
+              "title": "global market clock renders lanes with a next open",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 353,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:48.957Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-540da86150e7a80b676f",
+              "file": "app.spec.ts",
+              "line": 60,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "search and detail",
+          "file": "app.spec.ts",
+          "line": 70,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Ctrl-K finds AAPL with venue metadata and opens a real chart",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 824,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:49.315Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-95ce580316947206b624",
+              "file": "app.spec.ts",
+              "line": 71,
+              "column": 3
+            },
+            {
+              "title": "the chart axis and legend agree with the venue time zone",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 448,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:50.144Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-bcadb15bf5759059296c",
+              "file": "app.spec.ts",
+              "line": 95,
+              "column": 3
+            },
+            {
+              "title": "switching ranges and chart types re-renders without losing the chart",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 623,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:50.599Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-ab58836fe02c80cf74e4",
+              "file": "app.spec.ts",
+              "line": 103,
+              "column": 3
+            },
+            {
+              "title": "an unknown identifier says so instead of rendering an empty page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 316,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:51.229Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-1bdc9700808e77fbdeeb",
+              "file": "app.spec.ts",
+              "line": 117,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "watchlist",
+          "file": "app.spec.ts",
+          "line": 124,
+          "column": 6,
+          "specs": [
+            {
+              "title": "adds a symbol, keeps it across a reload and removes it",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 856,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:51.552Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-4a064b24d6cce3dd1e91",
+              "file": "app.spec.ts",
+              "line": 125,
+              "column": 3
+            },
+            {
+              "title": "creates a new list and switches to it",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 497,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:52.413Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-a512c9f2beb79c02b0bb",
+              "file": "app.spec.ts",
+              "line": 147,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "personalisation",
+          "file": "app.spec.ts",
+          "line": 163,
+          "column": 6,
+          "specs": [
+            {
+              "title": "theme, language and price convention persist across a reload",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 602,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:52.915Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-75add16505bc4e93caf9",
+              "file": "app.spec.ts",
+              "line": 164,
+              "column": 3
+            },
+            {
+              "title": "the data panel names its providers, tiers and cache state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 379,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:53.522Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-9deb961f133a204713e4",
+              "file": "app.spec.ts",
+              "line": 190,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "heatmap, portfolio, alerts, news",
+          "file": "app.spec.ts",
+          "line": 200,
+          "column": 6,
+          "specs": [
+            {
+              "title": "heatmap shows sized, coloured tiles and states its coverage",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 270,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:53.908Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-c5bc1717c281640b948a",
+              "file": "app.spec.ts",
+              "line": 201,
+              "column": 3
+            },
+            {
+              "title": "portfolio: add a holding, see valuation policy, then remove it",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 781,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:54.183Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-ac6236d4155cb6ea64fe",
+              "file": "app.spec.ts",
+              "line": 211,
+              "column": 3
+            },
+            {
+              "title": "alerts: a live threshold fires and lands in the trigger log",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15695,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:22:54.968Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-c1379c4467c727b5e884",
+              "file": "app.spec.ts",
+              "line": 231,
+              "column": 3
+            },
+            {
+              "title": "a 52-week alert is refused because no fundamentals feed is connected",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 289,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:10.669Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-26d4f5eab87d4a7848f8",
+              "file": "app.spec.ts",
+              "line": 252,
+              "column": 3
+            },
+            {
+              "title": "news shows source-backed headlines or an explicit offline state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 258,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:10.965Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-7474809d3a6eb077246f",
+              "file": "app.spec.ts",
+              "line": 261,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "resilience",
+          "file": "app.spec.ts",
+          "line": 280,
+          "column": 6,
+          "specs": [
+            {
+              "title": "the API answers, and unknown ids never produce a fake “live” label",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 140,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:11.229Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-f2a9da3cc93e2777bda7",
+              "file": "app.spec.ts",
+              "line": 281,
+              "column": 3
+            },
+            {
+              "title": "a malformed range is refused rather than silently defaulted",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 145,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:11.375Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-ed58996971f7159ccf8a",
+              "file": "app.spec.ts",
+              "line": 292,
+              "column": 3
+            },
+            {
+              "title": "the status endpoint reports provider health and cache state",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 132,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:11.525Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c31ff144dc4fee3acd0a-39f1bb2e657d7786655e",
+              "file": "app.spec.ts",
+              "line": 297,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "extended.spec.ts",
+      "file": "extended.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "100-symbol watchlist can be restored and rendered",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 654,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-08T02:23:11.668Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "7fda23695dabe9104257-50d12103a11b34549094",
+          "file": "extended.spec.ts",
+          "line": 5,
+          "column": 1
+        },
+        {
+          "title": "alert edits and pause are persisted through the UI",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 461,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-08T02:23:12.327Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "7fda23695dabe9104257-48dd1106d826aa7b2bd0",
+          "file": "extended.spec.ts",
+          "line": 23,
+          "column": 1
+        },
+        {
+          "title": "target viewport widths release hidden side-panel tracks",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 830,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-08T02:23:12.793Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "7fda23695dabe9104257-4e6c0b4a84e8ffd77103",
+          "file": "extended.spec.ts",
+          "line": 46,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "screenshots.spec.ts",
+      "file": "screenshots.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "visual acceptance",
+          "file": "screenshots.spec.ts",
+          "line": 38,
+          "column": 6,
+          "specs": [
+            {
+              "title": "01 global overview — light",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2081,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:13.632Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-a68c8176a49b910638b5",
+              "file": "screenshots.spec.ts",
+              "line": 39,
+              "column": 3
+            },
+            {
+              "title": "02 global overview — dark",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2186,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:15.717Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-16b6b4a7663db97cda11",
+              "file": "screenshots.spec.ts",
+              "line": 46,
+              "column": 3
+            },
+            {
+              "title": "03 US stock detail",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2056,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:17.909Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-79a9c7a650f15487a02f",
+              "file": "screenshots.spec.ts",
+              "line": 54,
+              "column": 3
+            },
+            {
+              "title": "04 China stock detail",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1982,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:19.972Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-bf68a0cb5144b934cae5",
+              "file": "screenshots.spec.ts",
+              "line": 61,
+              "column": 3
+            },
+            {
+              "title": "05 candlestick chart with volume",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4228,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:21.960Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-f737b8e04e5b539c200e",
+              "file": "screenshots.spec.ts",
+              "line": 67,
+              "column": 3
+            },
+            {
+              "title": "06 watchlist",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1800,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:26.196Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-8813e56f886ce55c9c3a",
+              "file": "screenshots.spec.ts",
+              "line": 79,
+              "column": 3
+            },
+            {
+              "title": "07 market heatmap",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1726,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:28.002Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-ebdee02b04235196b142",
+              "file": "screenshots.spec.ts",
+              "line": 86,
+              "column": 3
+            },
+            {
+              "title": "08 global market clock",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1335,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:29.734Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-7ea8fd4742c510fe1a74",
+              "file": "screenshots.spec.ts",
+              "line": 93,
+              "column": 3
+            },
+            {
+              "title": "09 portfolio",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3644,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:31.075Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-c64a2d7ea22b94993ada",
+              "file": "screenshots.spec.ts",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "10 mobile overview",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1997,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:34.724Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-db3a8c5db3279ea8116f",
+              "file": "screenshots.spec.ts",
+              "line": 120,
+              "column": 3
+            },
+            {
+              "title": "11 mobile stock detail",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2012,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:36.726Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-859b841ffa7562d151da",
+              "file": "screenshots.spec.ts",
+              "line": 128,
+              "column": 3
+            },
+            {
+              "title": "12 settings",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1739,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:38.746Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-59c77734754dc14e6721",
+              "file": "screenshots.spec.ts",
+              "line": 135,
+              "column": 3
+            },
+            {
+              "title": "13 Chinese interface",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2251,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:40.491Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-d82790aa3e8bc8ce1112",
+              "file": "screenshots.spec.ts",
+              "line": 142,
+              "column": 3
+            },
+            {
+              "title": "14 red-up price convention",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2140,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:42.747Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-64d5e7fc312d34588f47",
+              "file": "screenshots.spec.ts",
+              "line": 151,
+              "column": 3
+            },
+            {
+              "title": "15 news and market wire",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1478,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:44.892Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-c1731204deb4142bc8fe",
+              "file": "screenshots.spec.ts",
+              "line": 161,
+              "column": 3
+            },
+            {
+              "title": "16 markets reference table",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1850,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:46.376Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-f88ee88a8e72a31b9f5d",
+              "file": "screenshots.spec.ts",
+              "line": 168,
+              "column": 3
+            },
+            {
+              "title": "17 alerts",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop",
+                  "projectName": "desktop",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1675,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:48.232Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "677a4938ef65bfc6a6e5-a97f4248db77d4d49d5c",
+              "file": "screenshots.spec.ts",
+              "line": 175,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "mobile.spec.ts",
+      "file": "mobile.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "phone",
+          "file": "mobile.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "overview: bottom tabs, no sideways scroll, data visible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile",
+                  "projectName": "mobile",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 372,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:50.335Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e79c838550b25e92508e-1cb2f4e780cd3a59109f",
+              "file": "mobile.spec.ts",
+              "line": 13,
+              "column": 3
+            },
+            {
+              "title": "stock detail: full-width chart, no sideways scroll",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile",
+                  "projectName": "mobile",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 322,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:51.066Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e79c838550b25e92508e-acebba2ef2e539f7d66f",
+              "file": "mobile.spec.ts",
+              "line": 26,
+              "column": 3
+            },
+            {
+              "title": "every other page fits the viewport",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile",
+                  "projectName": "mobile",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4946,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:51.393Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e79c838550b25e92508e-ca5f3760a40885eff2a9",
+              "file": "mobile.spec.ts",
+              "line": 36,
+              "column": 3
+            },
+            {
+              "title": "the price convention still applies on a narrow screen",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile",
+                  "projectName": "mobile",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 371,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-08T02:23:56.344Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e79c838550b25e92508e-36f1705afeb35ed3e22c",
+              "file": "mobile.spec.ts",
+              "line": 45,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-08T02:22:45.463Z",
+    "duration": 71468.359,
+    "expected": 44,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
