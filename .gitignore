@@ -18,3 +18,6 @@ tsconfig.tsbuildinfo
 # misc
 .DS_Store
 *.log
+
+# project-local npm cache used by this checkout
+.npm-cache/

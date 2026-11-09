@@ -158,7 +158,11 @@ async function callProvider<T>(
 ): Promise<CapabilityResult<T>> {
   const h = healthOf(provider);
   if (!h.ok && h.cooldownMs > 0 && h.lastAttemptAt && Date.now() - h.lastAttemptAt < h.cooldownMs) {
-    return err('rate-limited', `${h.label} on cooldown after ${h.consecutiveErrors} failure(s)`, h.cooldownMs - (Date.now() - h.lastAttemptAt));
+    const remaining = h.cooldownMs - (Date.now() - h.lastAttemptAt);
+    // Record the reason even though this call never reached the network: the
+    // Settings panel must never show a provider as unhealthy without saying why.
+    h.lastError = `cooling down ${Math.ceil(remaining / 1000)}s after ${h.consecutiveErrors} failure(s) — ${h.lastError ?? 'no detail'}`;
+    return err('rate-limited', h.lastError, remaining);
   }
   h.lastAttemptAt = Date.now();
   const result = await fn().catch((e): CapabilityResult<T> => err('network', String((e as Error)?.message ?? e)));
