@@ -1,3 +1,4 @@
+import { redact } from '@/server/redact';
 import { ensureBoot } from '@/server/boot';
 import { NextResponse } from 'next/server';
 
@@ -41,7 +42,7 @@ export async function guarded<T>(fn: () => Promise<T>, label: string): Promise<N
     ensureBoot();
     return json(await fn());
   } catch (e) {
-    const message = String((e as Error)?.message ?? e);
+    const message = redact((e as Error)?.message ?? e);
     return json(
       {
         error: message,

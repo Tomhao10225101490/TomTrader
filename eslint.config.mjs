@@ -8,6 +8,7 @@ const eslintConfig = defineConfig([
   // Override default ignores of eslint-config-next.
   // Route contract tests and manual probes validate unknown vendor JSON at runtime.
   { files: ['tests/integration/api.test.ts', 'tools/*.mts'], rules: { '@typescript-eslint/no-explicit-any': 'off' } },
+  { files: ['desktop/**/*.cjs'], rules: { '@typescript-eslint/no-require-imports': 'off' } },
   { rules: { '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }] } },
   globalIgnores([
     // Default ignores of eslint-config-next:

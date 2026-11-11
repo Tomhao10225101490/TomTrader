@@ -1,8 +1,7 @@
-/** Clears the browser-side preference mirror. Server data is reset by the API. */
+/** Clears only browser preferences; never deletes server data or the live client identity. */
 export function clearAllUserDataLocal(): void {
   try {
     localStorage.removeItem('tomtrader.prefs.v1');
-    sessionStorage.removeItem('tomtrader.client');
   } catch {
     /* private mode */
   }

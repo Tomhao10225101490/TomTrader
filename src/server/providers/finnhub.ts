@@ -28,14 +28,19 @@ export class FinnhubProvider implements MarketDataProvider {
   }
   async getQuotes(instruments: Instrument[]): Promise<CapabilityResult<Quote[]>> {
     const key = process.env.FINNHUB_API_KEY;
-    if (!key) return err('no-key', 'Configure FINNHUB_API_KEY on the server.');
+    if (!key) return err('no-key', 'Configure your personal Finnhub key in desktop Settings or the web server environment.');
     const quotes: Quote[] = [];
     for (const i of instruments) {
       if (i.market !== 'US' || !['equity', 'etf'].includes(i.assetType)) continue;
       const res = await fetchJson<FinnhubQuote>('https://finnhub.io/api/v1/quote', {
         query: { symbol: i.displaySymbol }, headers: { 'X-Finnhub-Token': key }, timeoutMs: 8_000, retries: 1,
       });
-      if (!res.ok) return quotes.length ? ok(quotes) : err(res.error.kind === 'rate-limit' ? 'rate-limited' : 'network', res.error.message, res.error.retryAfterMs);
+      if (!res.ok) {
+        if (quotes.length) return ok(quotes);
+        if (res.error.status === 401) return err('no-key', 'Finnhub rejected the personal key. Check your key in Settings.');
+        if (res.error.status === 403) return err('unsupported', 'Finnhub account does not permit this quote. Check account entitlements.');
+        return err(res.error.kind === 'rate-limit' ? 'rate-limited' : 'network', res.error.message, res.error.retryAfterMs);
+      }
       if (res.data.error) return quotes.length ? ok(quotes) : err('unsupported', 'Finnhub refused this request; check account entitlements.');
       const quote = parseFinnhubQuote(i, res.data, this.declaredTier());
       if (quote) quotes.push(quote);

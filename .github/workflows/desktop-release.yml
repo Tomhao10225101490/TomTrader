@@ -1,0 +1,122 @@
+name: Desktop installers
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+  pull_request:
+    paths:
+      - 'desktop/**'
+      - 'src/**'
+      - 'tools/*desktop*'
+      - 'package*.json'
+      - 'next.config.ts'
+      - '.github/workflows/desktop-release.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS Apple Silicon
+            os: macos-15
+            arch: arm64
+            flags: --mac --arm64
+            executable: release/mac-arm64/TomTrader.app/Contents/MacOS/TomTrader
+          - name: macOS Intel
+            os: macos-15-intel
+            arch: x64
+            flags: --mac --x64
+            executable: release/mac/TomTrader.app/Contents/MacOS/TomTrader
+          - name: Windows x64
+            os: windows-2022
+            arch: x64
+            flags: --win --x64
+            executable: release/win-unpacked/TomTrader.exe
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.3'
+          architecture: ${{ matrix.arch }}
+          cache: npm
+      - run: npm ci
+      - name: Check native architecture and tag
+        shell: bash
+        env:
+          EXPECTED_ARCH: ${{ matrix.arch }}
+        run: |
+          node -e "if (process.arch !== process.env.EXPECTED_ARCH) throw new Error('Build runner architecture mismatch')"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            node -e "if (process.env.GITHUB_REF_NAME !== 'v' + require('./package.json').version) throw new Error('Tag must match package version')"
+          fi
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - name: Build native installers
+        run: npm run desktop:dist -- ${{ matrix.flags }}
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - name: Smoke test the packaged application
+        run: npm run desktop:smoke
+        env:
+          TOMTRADER_DESKTOP_EXECUTABLE: ${{ github.workspace }}/${{ matrix.executable }}
+      - name: Install from DMG or NSIS and test the installed application
+        run: node tools/test-installed-desktop.mjs
+      - name: Installer checksums
+        run: node tools/desktop-checksums.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.os }}-${{ matrix.arch }}
+          if-no-files-found: error
+          path: |
+            release/TomTrader-*.dmg
+            release/TomTrader-*.zip
+            release/TomTrader-*.exe
+            release/SHA256SUMS-*.txt
+            release/manifest-*.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: desktop-test-${{ matrix.os }}-${{ matrix.arch }}
+          path: test-results/desktop/
+          if-no-files-found: ignore
+
+  draft-release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: installers-*
+          path: installers
+          merge-multiple: true
+      - name: Create draft GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" installers/* --draft --verify-tag \
+            --title "TomTrader $GITHUB_REF_NAME" \
+            --notes "Desktop preview: macOS Apple Silicon/Intel DMG and Windows x64 EXE. Check SHA256SUMS before installing. Maintainers must verify signing/notarization and clean-machine installation before publishing. See docs/DESKTOP.md for security warnings and data-source limitations."

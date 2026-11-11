@@ -63,8 +63,9 @@ const coverage = ['CN','HK','US','indices','commodities'].map((market) => {
   return { market, requested: rows.length, available: rows.filter((r) => r.quote).length, missing: rows.filter((r) => !r.quote).map((r) => r.id) };
 });
 const evidence = { startedAt, completedAt: Date.now(), mode: 'real-network, isolated in-memory DB, no key, no demo, no persisted quotes', quoteSources, pipelineElapsedMs, coverage, quoteRows, histories, comparisons };
-fs.mkdirSync('docs/evidence', { recursive: true });
-fs.writeFileSync('docs/evidence/free-feeds.json', JSON.stringify(evidence,null,2));
+const evidenceDirectory = process.env.TOMTRADER_EVIDENCE_DIR || 'docs/evidence';
+fs.mkdirSync(evidenceDirectory, { recursive: true });
+fs.writeFileSync(`${evidenceDirectory}/free-feeds.json`, JSON.stringify(evidence,null,2));
 console.log(JSON.stringify({coverage, historiesPassed:histories.filter((h)=>h.ok).length, historiesRequested:histories.length}));
 for (const market of ['CN','HK','US']) if (!coverage.find((c)=>c.market===market)?.available) process.exitCode=1;
 for (const id of ['equity:CN:600519','equity:HK:00700','equity:US:AAPL']) if (!histories.some((h)=>h.id===id&&h.range==='1M'&&h.ok)) process.exitCode=1;

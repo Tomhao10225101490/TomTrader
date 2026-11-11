@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
    */
   cacheComponents: false,
 
+  // Desktop packages ship the traced Node server alongside Electron.
+  output: 'standalone',
+
   /**
    * Tailwind v4 with Turbopack: the stylesheet must go through
    * @tailwindcss/turbopack, otherwise `@theme`/`@custom-variant` are unknown

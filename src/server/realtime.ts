@@ -90,13 +90,16 @@ export function registerAlertSource(
 export function attach(clientId: string, send: Listener, close: () => void): { subscribed: Set<string> } {
   const h = hub();
   const client: Client = { id: clientId, send, close, subscribed: new Set(), connectedAt: Date.now(), paused: false };
+  h.clients.get(clientId)?.close();
   h.clients.set(clientId, client);
   startLoop();
   return { subscribed: client.subscribed };
 }
 
-export function detach(clientId: string): void {
+export function detach(clientId: string, expectedSend?: Listener): void {
   const h = hub();
+  // A late abort from a replaced stream must not detach the new connection.
+  if (expectedSend && h.clients.get(clientId)?.send !== expectedSend) return;
   h.clients.delete(clientId);
   if (h.clients.size === 0 && h.timer) {
     clearInterval(h.timer);
@@ -104,6 +107,7 @@ export function detach(clientId: string): void {
     h.running = false;
     if (h.heartbeat) clearInterval(h.heartbeat);
     h.heartbeat = null;
+    h.last.clear();
     releaseRefreshListener?.();
     releaseRefreshListener = null;
   }
@@ -289,6 +293,8 @@ async function tick(_reason: 'attach' | 'schedule'): Promise<void> {
     const ids = union();
     if (ids.length === 0) return;
 
+    const wanted = new Set(ids);
+    for (const id of h.last.keys()) if (!wanted.has(id)) h.last.delete(id);
     const next = desiredInterval(ids);
     if (h.timer && h.intervalMs !== next) schedule(next);
 

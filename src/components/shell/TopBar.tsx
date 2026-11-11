@@ -1,6 +1,8 @@
 'use client';
 import { Kbd } from '@/components/ui';
 import { cn } from '@/lib/cn';
+import { useNow } from '@/lib/hooks';
+import { buildClock } from '@/server/clockClient';
 import { formatClock } from '@/lib/format';
 import { marketName } from '@/lib/i18n';
 import { useI18n } from '@/lib/i18n-context';
@@ -10,7 +12,7 @@ import { useLive } from '@/stores/live';
 import { usePrefs } from '@/stores/prefs';
 import { Moon,Search,Settings,Sun } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect,useMemo,useState } from 'react';
+import { useMemo } from 'react';
 
 /**
  * Top bar. 44px, three zones: identity, search, live-status.
@@ -24,23 +26,14 @@ export function TopBar() {
   const theme = usePrefs((s) => s.theme);
   const set = usePrefs((s) => s.set);
   const connection = useLive((s) => s.connection);
-  const snapshots = useLive((s) => s.snapshots);
-  const [clock, setClock] = useState(() => Date.now());
-
-  useEffect(() => {
-    const id = setInterval(() => setClock(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
+  const clock = useNow();
+  const clockBucket = clock === null ? null : Math.floor(clock / 30_000);
+  // Venue state is independent of which quote rows this route subscribes to.
+  // A stock-detail page with no index snapshots must not say all markets closed.
   const openVenues = useMemo(() => {
-    const seen = new Map<ExchangeCode, boolean>();
-    for (const snap of Object.values(snapshots)) {
-      if (snap.instrument.assetType !== 'index') continue;
-      if (seen.has(snap.instrument.exchange)) continue;
-      seen.set(snap.instrument.exchange, snap.status.state === 'open');
-    }
-    return { open: [...seen.values()].filter(Boolean).length, total: seen.size };
-  }, [snapshots]);
+    const rows = clockBucket === null ? [] : buildClock(clockBucket * 30_000);
+    return { open: rows.filter((row) => row.state === 'open').length, total: rows.length };
+  }, [clockBucket]);
 
   const connectionTone =
     connection === 'open' ? 'bg-[var(--t-up)]' : connection === 'paused' ? 'bg-[var(--t-warn)]' : connection === 'connecting' ? 'bg-[var(--t-flat)]' : 'bg-[var(--t-down)]';
@@ -80,7 +73,7 @@ export function TopBar() {
         <div className="hidden items-center gap-1.5 text-[11px] text-ink-muted sm:flex" title={t('overview.subtitle', { open: openVenues.open, total: openVenues.total, at: '' }).trim()}>
           <span className={cn('led', openVenues.open > 0 && 'pulse-dot')} style={{ background: openVenues.open ? 'var(--t-up)' : 'var(--t-flat)' }} />
           <span className="num">
-            {openVenues.open === 0
+            {openVenues.total === 0 ? t('common.loading') : openVenues.open === 0
               ? t('status.allClosed')
               : openVenues.open === 1
                 ? t('status.oneOpen')
@@ -88,8 +81,8 @@ export function TopBar() {
           </span>
         </div>
 
-        <div className="hidden items-center gap-1.5 xl:flex" title={formatClock(clock, localZone, locale, { seconds: true })}>
-          <span className="num text-[11px] tabular-nums text-ink-secondary">{formatClock(clock, localZone, locale)}</span>
+        <div className="hidden items-center gap-1.5 xl:flex" title={clock === null ? '' : formatClock(clock, localZone, locale, { seconds: true })}>
+          <span className="num text-[11px] tabular-nums text-ink-secondary">{clock === null ? '—' : formatClock(clock, localZone, locale)}</span>
           <span className="text-[10px] uppercase text-ink-faint">{localZone.split('/').pop()?.replace(/_/g, ' ')}</span>
         </div>
 

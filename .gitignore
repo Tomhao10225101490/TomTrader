@@ -2,6 +2,8 @@
 node_modules/
 .next/
 out/
+desktop-build/
+release/
 
 # local runtime data (SQLite databases, incl. WAL/SHM)
 data/

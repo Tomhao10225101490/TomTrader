@@ -53,7 +53,22 @@ Measured on 2026-11-08 against a fresh in-memory database (curated universe, not
 
 **Latency is labeled "unverified" everywhere.** The public endpoints make no verifiable latency promise, so the app never claims "real-time" or a fixed 15-minute delay. The pipeline is bounded server-side REST polling → browser SSE; the "connected" indicator describes the transport, not exchange-grade streaming. Public web sources can be rate-limited or change without notice — see [KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) and [DATA_ACCURACY.md](docs/DATA_ACCURACY.md).
 
-## Quick start
+## Desktop application (macOS / Windows)
+
+TomTrader now includes an Electron desktop shell and native installer build pipeline. End users can install a **macOS DMG** (Apple Silicon or Intel) or **Windows x64 EXE** without installing Node.js or running a web server themselves. Installers are available from [GitHub Releases](https://github.com/Tomhao10225101490/TomTrader/releases) once a desktop release is published; adding this pipeline does not itself publish a release.
+
+The desktop app asks for public-feed consent on first launch, supports offline demo mode, stores data in the OS application-data directory, and retains preferences across launches. It still does not execute trades. Public data-source restrictions apply equally to desktop builds.
+
+Build on the target OS/architecture:
+
+```sh
+npm ci
+npm run desktop:dist
+```
+
+Output: `release/`. Native Mac/Windows builds and packaged-app smoke tests are configured in `.github/workflows/desktop-release.yml`. Unsigned preview builds can trigger OS security warnings; signed/notarized public releases require maintainer credentials. See **[Desktop installation, builds, signing and releases](docs/DESKTOP.md)**.
+
+## Quick start (web / development)
 
 Requires **Node.js 22.13+** and npm.
 
@@ -145,6 +160,7 @@ data/             Local SQLite databases (git-ignored; created at runtime)
 
 ## Documentation
 
+- [Desktop app: installation, builds, signing and releases](docs/DESKTOP.md)
 - [Architecture](docs/ARCHITECTURE.md) · [Design system](docs/DESIGN_SYSTEM.md) · [API reference](docs/API_REFERENCE.md)
 - [Market data providers & licensing](docs/MARKET_DATA_PROVIDERS.md) · [Data accuracy & official calendars](docs/DATA_ACCURACY.md)
 - [Test report](docs/TEST_REPORT.md) · [Performance report](docs/PERFORMANCE_REPORT.md) · [Visual acceptance](docs/VISUAL_ACCEPTANCE.md)

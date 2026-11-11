@@ -91,6 +91,7 @@ export const useLive = create<LiveState>((set, get) => ({
   },
 
   setRefreshPolicy: (next) => {
+    if (policy === next && booted && (source || slowTimer || next === 'off')) return;
     policy = next;
     stopWatchdog();
     if (backoffTimer) clearTimeout(backoffTimer);
@@ -166,12 +167,15 @@ function connect(): void {
     return;
   }
 
+  const stream = source;
   source.onopen = () => {
+    if (source !== stream) return;
     useLive.setState({ connection: 'open', attempt: 0, lastError: null });
     startWatchdog();
   };
 
   source.onmessage = (event) => {
+    if (source !== stream) return;
     useLive.setState({ lastFrameAt: Date.now(), connection: 'open' });
     let frame: SseFrame;
     try {
@@ -195,6 +199,7 @@ function connect(): void {
   };
 
   source.onerror = () => {
+    if (source !== stream) return;
     source?.close();
     source = null;
     stopWatchdog();
@@ -236,6 +241,27 @@ function stopWatchdog(): void {
 
 function attachVisibility(): void {
   if (typeof document === 'undefined') return;
+  const pause = () => {
+    source?.close();
+    source = null;
+    stopWatchdog();
+    if (backoffTimer) clearTimeout(backoffTimer);
+    backoffTimer = null;
+    if (slowTimer) clearInterval(slowTimer);
+    slowTimer = null;
+    useLive.setState({ connection: 'offline' });
+  };
+  const resume = () => {
+    pause();
+    if (policy === 'auto' && !document.hidden) connect();
+    else if (policy === 'slow') startSlowPoll();
+    else useLive.setState({ connection: 'paused' });
+    if (policy !== 'off') void catchUp();
+  };
+  window.addEventListener('offline', pause);
+  window.addEventListener('online', resume);
+  window.addEventListener('tomtrader:suspend', pause);
+  window.addEventListener('tomtrader:resume', resume);
   document.addEventListener('visibilitychange', () => {
     if (policy !== 'auto') return;
     if (document.hidden) {

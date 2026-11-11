@@ -13,36 +13,23 @@ import { convert,getFxRates } from '@/server/providers/fx';
 import { getMarketWire } from '@/server/providers/news';
 import { yahoo } from '@/server/providers/yahoo';
 import type { Instrument } from '@/server/types';
-import { beforeAll,describe,expect,it } from 'vitest';
+import { describe,expect,it } from 'vitest';
 
-let online = false;
-
-beforeAll(async () => {
-  if (process.env.TOMTRADER_LIVE_TESTS !== '1' || process.env.TOMTRADER_PUBLIC_FEEDS !== '1') return;
-  try {
-    const r = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?range=1d&interval=1d', {
-      signal: AbortSignal.timeout(9_000),
-    });
-    online = r.ok;
-  } catch {
-    online = false;
-  }
-}, 20_000);
+const enabled = process.env.TOMTRADER_LIVE_TESTS === '1' && process.env.TOMTRADER_PUBLIC_FEEDS === '1';
 
 function live(label: string, fn: () => Promise<void>) {
   return it(label, async (ctx) => {
-    if (!online) {
-      ctx.skip('Live vendor checks require TOMTRADER_LIVE_TESTS=1, confirmed data rights, and a reachable provider.');
+    if (!enabled) {
+      ctx.skip('Opt-in external-network check: TOMTRADER_LIVE_TESTS=1 and TOMTRADER_PUBLIC_FEEDS=1.');
     }
     await fn();
   });
 }
 
 /**
- * A vendor that refuses us (429 / network) is recorded as a skip with the
- * reason printed, not as a pass. The suite then reports how much of the live
- * surface it actually exercised, which is the only way a green run means
- * something.
+ * Once explicitly enabled, rejection/timeouts are failures, not skips or
+ * silent passes. Each provider is checked independently; a Yahoo failure
+ * must not suppress Eastmoney, FX, or news verification.
  */
 function requireOk<T extends { ok: boolean; reason?: string; message?: string }>(res: T, label: string): res is T & { ok: true } {
   if (res.ok) return true;
@@ -115,7 +102,7 @@ describe('yahoo adapter', () => {
 
   live('intraday series for an index uses minute bars', async () => {
     const res = await yahoo.getHistoricalBars(instrumentById('index:US:^GSPC')!, '1D', '5m');
-    if (!res.ok) return;
+    if (!requireOk(res, 'yahoo intraday')) return;
     expect(res.data.bars.length).toBeGreaterThan(5);
     const span = res.data.bars.at(-1)!.time - res.data.bars[0].time;
     expect(span).toBeLessThan(9 * 3600);
@@ -127,7 +114,8 @@ describe('eastmoney adapter', () => {
     const ids = ['index:CN:000001', 'index:HK:^HSI', 'equity:CN:600519', 'equity:HK:00700'];
     const instruments = ids.map((id) => instrumentById(id)!);
     const [em, yh] = await Promise.all([eastmoney.getQuotes(instruments), yahoo.getQuotes(instruments)]);
-    if (!em.ok || !yh.ok) return;
+    if (!requireOk(em, 'eastmoney comparison') || !requireOk(yh, 'yahoo comparison')) return;
+    let compared = 0;
     for (const e of em.data) {
       const y = yh.data.find((q) => q.instrumentId === e.instrumentId);
       if (!y || !Number.isFinite(y.last) || y.last === 0) continue;
@@ -135,7 +123,9 @@ describe('eastmoney adapter', () => {
       // computed identically, so anything above half a percent is a mapping bug.
       const diff = Math.abs(e.last - y.last) / y.last;
       expect(diff).toBeLessThan(0.005);
+      compared++;
     }
+    expect(compared).toBeGreaterThan(0);
   });
 
   live('A-share volume is normalised from lots to shares', async () => {
@@ -163,8 +153,12 @@ describe('eastmoney adapter', () => {
 
   live('one-minute trend series covers a session', async () => {
     const res = await eastmoney.getHistoricalBars(instrumentById('equity:CN:600519')!, '1D', '1m');
-    if (!res.ok) return;
-    expect(res.data.bars.length).toBeGreaterThan(200);
+    if (!requireOk(res, 'eastmoney minute trend')) return;
+    // A live session can be at its first minute or midday break; demanding a
+    // full day's >200 rows incorrectly fails valid partial-session data.
+    expect(res.data.bars.length).toBeGreaterThan(0);
+    expect(res.data.bars.length).toBeLessThanOrEqual(300);
+    for (let n = 1; n < res.data.bars.length; n++) expect(res.data.bars[n].time).toBeGreaterThan(res.data.bars[n - 1].time);
     expect(res.data.adjustment).toBe('raw');
   });
 });

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
+import { redact } from './redact';
 
 /**
  * Local persistence (SQLite).
@@ -28,14 +29,21 @@ export function dbPath(): string {
 
 export function getDb(): DatabaseSync {
   if (handle) return handle;
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.mkdirSync(DATA_DIR, { recursive: true, mode: 0o700 });
   path_ = process.env.TOMTRADER_DB === ':memory:' ? ':memory:' : path.resolve(process.env.TOMTRADER_DB || path.join(DATA_DIR, process.env.TOMTRADER_DEMO === '1' ? 'demo.db' : 'tomtrader.db'));
   if (path_ != ':memory:') fs.mkdirSync(path.dirname(path_), { recursive: true });
   handle = new DatabaseSync(path_);
+  if (path_ !== ':memory:') fs.chmodSync(path_, 0o600);
   handle.exec('PRAGMA journal_mode = WAL');
   handle.exec('PRAGMA synchronous = NORMAL');
   handle.exec('PRAGMA foreign_keys = ON');
-  migrate(handle);
+  try {
+    migrate(handle, path_);
+  } catch (error) {
+    handle.close();
+    handle = null;
+    throw error; // Never delete/reseed a database after migration failure.
+  }
   return handle;
 }
 
@@ -165,13 +173,33 @@ CREATE TABLE IF NOT EXISTS kv (
 );
 `;
 
-function migrate(db: DatabaseSync): void {
-  db.exec(SCHEMA);
-  const row = db.prepare('SELECT value FROM kv WHERE key = ?').get('schema_version') as { value: string } | undefined;
-  const version = 1;
-  if (!row) {
-    db.prepare('INSERT INTO kv (key, value) VALUES (?, ?)').run('schema_version', String(version));
+export function migrate(db: DatabaseSync, filename = ':memory:'): void {
+  const hasKv = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='kv'").get();
+  const row = hasKv ? db.prepare('SELECT value FROM kv WHERE key = ?').get('schema_version') as { value: string } | undefined : undefined;
+  const version = row ? Number(row.value) : 0;
+  if (!Number.isInteger(version) || version < 0 || version > 1) throw new Error('Unsupported database version. Use a compatible TomTrader version; data has not been cleared.');
+  if (version === 1) return; // This RC intentionally needs no destructive schema change.
+  const hasExistingTables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' LIMIT 1").get();
+  if (filename !== ':memory:' && hasExistingTables) {
+    const directory = path.join(path.dirname(filename), 'migration-backups');
+    fs.mkdirSync(directory, { recursive: true });
+    db.prepare('VACUUM INTO ?').run(path.join(directory, `before-v1-${Date.now()}.db`));
   }
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    db.exec(SCHEMA);
+    db.prepare('INSERT INTO kv (key, value) VALUES (?, ?)').run('schema_version', '1');
+    db.exec('COMMIT');
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
+}
+
+/** A consistent SQLite snapshot includes committed WAL data; no raw live-file copying. */
+export function snapshotDatabase(filename: string): void {
+  getDb().prepare('VACUUM INTO ?').run(filename);
+  fs.chmodSync(filename, 0o600);
 }
 
 /* ------------------------------------------------------------------ helpers */
@@ -191,7 +219,7 @@ export function logProviderEvent(provider: string, op: string, outcome: string, 
   try {
     getDb()
       .prepare('INSERT INTO provider_log (ts, provider, op, outcome, detail) VALUES (?, ?, ?, ?, ?)')
-      .run(Date.now(), provider, op, outcome, detail ?? null);
+      .run(Date.now(), provider, op, outcome, detail == null ? null : redact(detail));
     // keep the log bounded
     getDb().prepare('DELETE FROM provider_log WHERE id < (SELECT MAX(id) - 2000 FROM provider_log)').run();
   } catch {

@@ -1,4 +1,5 @@
 'use client';
+import { DesktopDataSettings } from '@/components/DesktopDataSettings';
 import { Block,Page } from '@/components/Page';
 import { Button,ErrorState,Segmented,SelectInput } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -35,6 +36,7 @@ export default function SettingsPage() {
 
   return (
     <Page title={t('settings.title')} subtitle={t('settings.privacy')}>
+      <DesktopDataSettings />
       <div className="grid gap-4 xl:grid-cols-2">
         <Block title={t('settings.appearance')}>
           <div className="flex flex-col gap-3 p-3">
@@ -121,7 +123,6 @@ export default function SettingsPage() {
                   variant="danger"
                   onClick={async () => {
                     if (!window.confirm(t('settings.confirmReset'))) return;
-                    await fetch('/api/watchlist', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ op: 'noop' }) }).catch(() => undefined);
                     clearAllUserDataLocal();
                     prefs.reset();
                     setStatusNonce((n) => n + 1);
@@ -200,7 +201,7 @@ export default function SettingsPage() {
       <Block title={t('settings.about')}>
         <div className="flex flex-col gap-2 p-3 text-[12px] leading-relaxed text-ink-secondary">
           <p>
-            <strong className="font-semibold text-ink">TomTrader</strong> — {t('app.tagline')} · v1.0.0
+            <strong className="font-semibold text-ink">TomTrader</strong> — {t('app.tagline')} · desktop RC
           </p>
           <p>{t('settings.aboutBody')}</p>
           <p className="text-[11px] text-ink-muted">

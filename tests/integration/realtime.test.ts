@@ -62,6 +62,17 @@ describe('stream hub', () => {
     expect(hubState().subscribed).toBe(1);
   });
 
+  it('a late abort from a replaced stream cannot remove the new client', () => {
+    const oldSend = () => undefined;
+    const currentSend = () => undefined;
+    connect('same-tab', oldSend);
+    connect('same-tab', currentSend);
+    detach('same-tab', oldSend);
+    expect(hubState().clients).toBe(1);
+    detach('same-tab', currentSend);
+    expect(hubState().clients).toBe(0);
+  });
+
   it('stops feeding a hidden tab', () => {
     const frames: SseFrame[] = [];
     connect('c-hidden', (f) => frames.push(f));

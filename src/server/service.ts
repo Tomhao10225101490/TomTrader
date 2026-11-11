@@ -35,6 +35,7 @@ OVERVIEW_GROUPS,
 UNIVERSE,
 } from './instruments';
 import { addDaysToLocalDate,getMarketStatus,planDay,zoned } from './marketstatus';
+import { redact } from './redact';
 import { publicFeedsEnabled } from './providers/access';
 import { demo } from './providers/demo';
 import { eastmoney } from './providers/eastmoney';
@@ -178,7 +179,7 @@ async function callProvider<T>(
     h.cooldownMs = 0;
   } else {
     h.consecutiveErrors += 1;
-    h.lastError = `${result.reason}: ${result.message}`;
+    h.lastError = redact(`${result.reason}: ${result.message}`);
     h.cooldownMs = Math.max(
       result.retryAfterMs ?? 0,
       result.reason === 'rate-limited' ? 30_000 : 5_000,
@@ -433,7 +434,7 @@ export async function refreshQuotes(ids: string[], opts: { interactive?: boolean
     const byProvider = new Map<ProviderId, Instrument[]>();
     for (const instrument of instruments) {
       const [first] = route(instrument);
-      if (!first) { issues.set(instrument.id, { provider: 'configuration', reason: 'no-key', message: 'No authorized provider configured for this market. Cached data may be shown; configure a provider in .env.local.', at: Date.now() }); continue; }
+      if (!first) { issues.set(instrument.id, { provider: 'configuration', reason: 'no-key', message: 'No authorized provider configured for this market. Cached data may be shown; configure sources in desktop Settings or the web server environment.', at: Date.now() }); continue; }
       const list = byProvider.get(first) ?? [];
       list.push(instrument);
       byProvider.set(first, list);
@@ -641,7 +642,7 @@ export async function getSnapshots(ids: string[], opts: SnapshotOptions): Promis
     const instrument = resolveInstrument(id);
     if (!instrument) continue;
     const hit = peek<Quote>('quote', id)?.value ?? map.get(id)?.value ?? null;
-    const snap = snapshotOf(instrument, hit, now);
+    const snap = snapshotOf(instrument, hit, Date.now());
     snap.issue = lastIssues.get(id) ?? null;
     out.set(id, snap);
   }

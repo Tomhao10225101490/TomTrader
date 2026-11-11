@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   const ids = (req.nextUrl.searchParams.get('ids') ?? '').split(',').filter(Boolean);
 
   const encoder = new TextEncoder();
-  let timer: ReturnType<typeof setInterval> | undefined;
+  let cleanup = () => {};
 
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
@@ -33,7 +33,6 @@ export async function GET(req: NextRequest) {
       };
 
       const close = () => {
-        if (timer) clearInterval(timer);
         try {
           controller.close();
         } catch {
@@ -41,6 +40,7 @@ export async function GET(req: NextRequest) {
         }
       };
 
+      cleanup = () => { detach(clientId, send); close(); };
       attach(clientId, send, close);
       if (ids.length) subscribe(clientId, ids);
 
@@ -48,14 +48,11 @@ export async function GET(req: NextRequest) {
       const state = hubState();
       send({ type: 'state', at: Date.now(), state: { ...state, paused: false } });
 
-      req.signal.addEventListener('abort', () => {
-        detach(clientId);
-        close();
-      });
+      req.signal.addEventListener('abort', cleanup, { once: true });
+      if (req.signal.aborted) cleanup();
     },
     cancel() {
-      detach(clientId);
-      if (timer) clearInterval(timer);
+      cleanup();
     },
   });
 
