@@ -256,7 +256,7 @@ export const StampLine = memo(function StampLine({
       </span>
       <span className="text-line-strong">·</span>
       <span title={`${t('quality.receivedTime')} ${timeIn(quote.receivedAt, exchange, { seconds: true })}`}>
-        {formatAgo(quote.receivedAt, now, locale)}
+        {t('quality.receivedTime')} {formatAgo(quote.receivedAt, now, locale)}
       </span>
     </span>
   );

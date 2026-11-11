@@ -49,6 +49,7 @@ try {
   const before = await request(page, '/api/portfolio', { op: 'export' }); delete before.exportedAt;
   await page.goto(new URL('/settings', page.url()).href);
   await page.getByRole('radio', { name: /^Dark$/ }).click();
+  await page.getByRole('radio', { name: '简体中文' }).click();
   await page.waitForTimeout(800);
   await application.close(); application = null;
   const settingsFile = path.join(profile, 'desktop-settings.json');
@@ -61,7 +62,8 @@ try {
   const after = await request(page, '/api/portfolio', { op: 'export' }); delete after.exportedAt;
   expect(after).toEqual(before);
   await expect(page.locator('html')).toHaveClass(/dark/);
-  report.checks.push('Actual 1.0.0 → RC replacement in same installation path: groups, synthetic holdings, disabled alert, theme retained');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
+  report.checks.push('Actual 1.0.0 → RC replacement in same installation path: groups, synthetic holdings, disabled alert, theme and Chinese locale retained');
   report.version = await application.evaluate(({ app }) => app.getVersion());
 
   // Real native secure-storage API, with a clearly labelled dummy key while
@@ -143,11 +145,12 @@ try {
   await expect.poll(() => page.url(), { timeout: 30_000 }).not.toContain(`:${oldPort}`);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.locator('html')).toHaveClass(/dark/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
   const recovered = await request(page, '/api/portfolio', { op: 'export' }); delete recovered.exportedAt;
   expect(recovered).toEqual(before);
   await application.evaluate(({ dialog }) => { dialog.showMessageBox = globalThis.__originalMessageBox; });
   await closeHeldPort();
-  report.checks.push('Own service termination + occupied saved port: native recovery chooses new port, data/theme preserved');
+  report.checks.push('Own service termination + occupied saved port: native recovery chooses new port, data/theme/Chinese locale preserved');
   await application.close(); application = null;
 
   // Deny the complete checkout to the installed process and all descendants.
