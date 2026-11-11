@@ -775,12 +775,42 @@ export async function ensureSparklines(ids: string[], opts: { batchSize?: number
  * Metadata
  * ----------------------------------------------------------------------- */
 
-export async function getMetadata(id: string): Promise<{ meta: InstrumentMetadata | null; issue: string | null }> {
+type MetadataResult = { meta: InstrumentMetadata | null; issue: string | null };
+const metadataFlights = new Map<string, Promise<MetadataResult>>();
+const metadataFailures = new Map<string, { until: number; result: MetadataResult }>();
+
+/** Optional fundamentals must never hold a quote/chart page hostage. */
+export async function getMetadata(id: string, opts: { mode?: 'await' | 'stale' } = {}): Promise<MetadataResult> {
   const instrument = resolveInstrument(id);
   if (!instrument) return { meta: null, issue: 'unknown-instrument' };
   const hit = peek<InstrumentMetadata>('meta', id);
   if (hit && hit.expiresAt > Date.now()) return { meta: hit.value, issue: null };
+  const failure = metadataFailures.get(id);
+  if (failure && failure.until > Date.now()) return failure.result;
+  metadataFailures.delete(id);
+  let flight = metadataFlights.get(id);
+  if (!flight) {
+    flight = refreshMetadata(instrument).catch((error) => {
+      console.warn('[metadata] refresh failed:', redact(String(error)));
+      return { meta: hit?.value ?? null, issue: 'unavailable' } satisfies MetadataResult;
+    }).then((result) => {
+      if (result.issue) {
+        metadataFailures.set(id, { until: Date.now() + 60_000, result });
+        if (metadataFailures.size > 128) metadataFailures.delete(metadataFailures.keys().next().value!);
+      }
+      return result;
+    }).finally(() => metadataFlights.delete(id));
+    metadataFlights.set(id, flight);
+  }
+  if (opts.mode === 'stale') {
+    const persisted = hit ?? restoreMeta(id);
+    return { meta: persisted?.value ?? null, issue: 'refreshing' };
+  }
+  return flight;
+}
 
+async function refreshMetadata(instrument: Instrument): Promise<MetadataResult> {
+  const id = instrument.id;
   for (const providerId of route(instrument)) {
     const provider = PROVIDERS[providerId];
     if (!provider?.getMetadata) continue;

@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       return { error: 'unknown-instrument', id, httpStatus: 404 };
     }
     const [snapshot] = await getSnapshots([instrument.id], { mode: 'await' });
-    const { meta, issue } = await getMetadata(instrument.id);
+    const { meta, issue } = await getMetadata(instrument.id, { mode: 'stale' });
     // "Same market" means comparable securities: for a stock, other stocks of
     // that market — not its FX pairs or futures, which share the market code.
     const pool = UNIVERSE.filter(

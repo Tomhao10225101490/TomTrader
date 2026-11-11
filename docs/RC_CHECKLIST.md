@@ -15,10 +15,11 @@ Target: **1.0.1-rc.1**, Apple Silicon, macOS 15.1 (24B2083). This round does not
 - [x] LaunchServices `open` system entry and missing-resource actionable startup failure.
 - [x] Actual cached real-mode cold start with per-process upstream-network fault injection; restore network on next launch. No OS-wide networking change.
 - [x] Ten-minute real-provider session: 21 samples, one steady stream, genuine automatic quote refresh timestamps, no page errors. Not multi-day endurance certification.
-- [x] Default tests: 148 unit + 32 integration passed; 12 opt-in live cases remain excluded by default, not claimed as covered there.
+- [x] Default tests: 150 unit + 32 integration passed; 12 opt-in live cases remain excluded by default, not claimed as covered there.
 - [x] 23 Demo production-web UI E2E cases passed separately; not live-provider evidence.
 - [x] All 12 formerly skipped cases explicitly executed. Six keyless cases passed after fixing the invalid partial-session minute-count assertion; six Yahoo-dependent cases failed due to upstream 429/cooldown. Pure conversion tests add two passes. No credential key required for those 12.
 - [x] Production dependency audit: zero reported advisories at this check.
+- [x] Final-package regression found optional fundamentals could time out the entire detail request. Details now return independently of that source, reuse one metadata refresh job, retain real cached metadata, back off failures and retry only while visible/refresh enabled. Two dedicated fixture regressions cover delayed/failing optional sources; installed real charts must be rechecked after rebuild.
 - [ ] Optional stronger checkout-denial sandbox: attempted, OS refuses nested Chromium sandbox initialization; **blocked, not passed**. Normal Electron sandbox remains enabled. Independent install/resource-resolution checks pass without lowering security.
 - [ ] Physical sleep/wake, whole-system offline switch, OS reboot and multi-day resource testing: not performed; injected events and ten-minute soak are labeled accurately.
 - [ ] Real Finnhub account: no personal key supplied. Header/401/403/429/no-fake-fallback fixtures passed; official-only mode does not provide historical bars.

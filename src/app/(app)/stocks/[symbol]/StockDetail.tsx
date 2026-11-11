@@ -56,6 +56,15 @@ export function StockDetail({
     [instrumentId, range],
   );
 
+  const reloadDetail = detail.reload;
+  useEffect(() => {
+    if (!detail.data?.metadataIssue || refreshPolicy === 'off') return;
+    const catchUp = () => { if (!document.hidden) reloadDetail(); };
+    const timer = setInterval(catchUp, detail.data.metadataIssue === 'refreshing' ? 5000 : 60_000);
+    document.addEventListener('visibilitychange', catchUp);
+    return () => { clearInterval(timer); document.removeEventListener('visibilitychange', catchUp); };
+  }, [detail.data, reloadDetail, refreshPolicy]);
+
   const reloadBars = bars.reload;
   useEffect(() => {
     if (refreshPolicy === 'off') return;

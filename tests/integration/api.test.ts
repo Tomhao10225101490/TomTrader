@@ -108,7 +108,8 @@ describe('market data endpoints', () => {
     expect(body.error).toContain('unknown range');
   });
 
-  it('GET /api/detail returns instrument, snapshot, metadata and related list', async () => {
+  it('GET /api/detail returns instrument, snapshot, cached metadata and related list', async () => {
+    await (await import('@/server/service')).getMetadata('equity:US:AAPL');
     const { body } = await get('/api/detail?id=equity%3AUS%3AAAPL');
     expect(body.instrument.id).toBe('equity:US:AAPL');
     expect(body.snapshot.quote.last).toBeGreaterThan(0);
