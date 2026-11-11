@@ -44,6 +44,15 @@ describe('credential storage protocol fixtures (not real Finnhub verification)',
     store.forget();
     expect(store.get()).toBe('');
   });
+  it('public feeds and session-only keys never wait for a native Keychain permission probe', async () => {
+    const probe = vi.fn(() => new Promise<boolean>(() => {}));
+    const store = await createCredentialStore(directory(), { isAsyncEncryptionAvailable: probe });
+    expect(store.status()).toMatchObject({ secureStorage: false, secureStorageChecked: false });
+    await store.set('fixture-api-key-1234', false);
+    expect(store.get()).toBe('fixture-api-key-1234');
+    expect(store.status().persistent).toBe(false);
+    expect(probe).not.toHaveBeenCalled();
+  });
   it('refuses plaintext fallback but permits session-only credentials', async () => {
     const dir = directory();
     const store = await createCredentialStore(dir, { isAsyncEncryptionAvailable: async () => false });

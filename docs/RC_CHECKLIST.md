@@ -9,13 +9,14 @@ Target: **1.0.1-rc.1**, Apple Silicon, macOS 15.1 (24B2083). This round does not
 - [x] Independently copy application from RC DMG, eject image, run without development server or developer PATH; verify real backend/Next resolution inside installed resources.
 - [x] Real installed first-run/search/identity/CNY-HKD-USD/quotes/history/watchlist/restart. No unlabeled generated fallback.
 - [x] Real 1.0.0 → RC replacement at the same isolated installation path retains lists, synthetic test holdings, disabled alert and appearance.
-- [x] Native secure-storage fixture survives restart; never plaintext; removal works. This is not real Finnhub account verification.
+- [x] Credential protocol fixtures encrypt persisted keys, reject plaintext fallback and preserve settings. Final native session-only/removal checks do not require Keychain access; real Finnhub account verification remains separate.
+- [ ] Final ad-hoc identity's native encrypted persistence requires macOS Keychain authorization; not claimed as passed. The earlier pre-seal binary exercised native encryption, but that is not evidence for a changed code identity. Public feeds do not probe/block on Keychain; checking/unlocking storage is an explicit native-dialog action.
 - [x] macOS close/activate, explicit quit, duplicate launch, 2× Retina, actual fullscreen and resize.
 - [x] Own service crash + occupied port → recovery/new port; data, theme and language retained. Bounded own-child shutdown including SSE grace timeout.
 - [x] LaunchServices `open` system entry and missing-resource actionable startup failure.
 - [x] Actual cached real-mode cold start with per-process upstream-network fault injection; restore network on next launch. No OS-wide networking change.
 - [x] Ten-minute real-provider session: 21 samples, one steady stream, genuine automatic quote refresh timestamps, no page errors. Not multi-day endurance certification.
-- [x] Default tests: 150 unit + 32 integration passed; 12 opt-in live cases remain excluded by default, not claimed as covered there.
+- [x] Default tests: 151 unit + 32 integration passed; 12 opt-in live cases remain excluded by default, not claimed as covered there.
 - [x] 23 Demo production-web UI E2E cases passed separately; not live-provider evidence.
 - [x] All 12 formerly skipped cases explicitly executed. Six keyless cases passed after fixing the invalid partial-session minute-count assertion; six Yahoo-dependent cases failed due to upstream 429/cooldown. Pure conversion tests add two passes. No credential key required for those 12.
 - [x] Production dependency audit: zero reported advisories at this check.

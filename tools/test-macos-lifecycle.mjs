@@ -73,6 +73,10 @@ try {
   let config = await configure;
   await config.locator('#mode').selectOption('demo');
   await config.locator('#key').fill('fixture-not-a-real-account-123456');
+  if (process.env.TOMTRADER_TEST_SECURE_STORAGE === '1') {
+    await config.locator('#check-storage').click();
+    await expect(config.locator('#check-storage')).toBeEnabled({ timeout: 30_000 });
+  }
   const secure = !(await config.locator('#persist').isDisabled());
   if (!secure) await config.locator('#persist').uncheck();
   await config.locator('#save').click();
@@ -84,7 +88,7 @@ try {
   application = await launch(upgradeExecutable);
   page = await pageOf(application);
   expect((await page.evaluate(() => window.tomtraderDesktop.status())).configured).toBe(secure);
-  report.secureStorage = secure ? 'Native asynchronous encryption/decryption passed across restart; fixture key only, Demo network disabled' : 'OS storage unavailable; session-only used, no plaintext persistence';
+  report.secureStorage = secure ? 'Native asynchronous encryption/decryption passed across restart; fixture key only, Demo network disabled' : 'Session-only verified; OS-encrypted persistence on this re-signed preview requires native Keychain authorization and is not claimed by this run';
   const clearing = application.waitForEvent('window');
   await page.evaluate(() => window.tomtraderDesktop.configure()); config = await clearing;
   await config.locator('#forget').check();
@@ -92,7 +96,8 @@ try {
   await expect(config.locator('#result')).toContainText('Applied', { timeout: 30_000 });
   await config.close();
   expect((await page.evaluate(() => window.tomtraderDesktop.status())).configured).toBe(false);
-  report.checks.push('Credential entry isolated from market renderer; native secure storage or explicit session-only; key removal works');
+  report.checks.push(secure ? 'Native encrypted credential fixture survives restart; key removal works' : 'Credential entry isolated from market renderer; explicit session-only never persists a key and does not survive restart; key removal works');
+  if (!secure) report.limitations.push('Native encrypted persistence not revalidated for this final code identity: requires user Keychain approval. No permission bypass; optional explicit TOMTRADER_TEST_SECURE_STORAGE=1 checks it with owner approval.');
 
   // Window lifecycle follows macOS: close hides all windows, Dock activation
   // recreates the market window, Cmd+Q/app.quit stops only its own service.

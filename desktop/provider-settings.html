@@ -4,7 +4,7 @@
 <body><h1>Data sources / 行情数据源</h1><p>No developer key is bundled. Use public feeds for personal research or enter your own Finnhub key. Latency is unverified; Finnhub integration supplies US stock/ETF quotes only, not historical charts.</p>
 <label for="mode">Mode / 模式</label><select id="mode"><option value="demo">Offline Demo — synthetic prices / 模拟数据</option><option value="personal">Personal public feeds — real requests / 公开行情</option><option value="official">My Finnhub key only — US quotes / 仅个人 Key</option></select>
 <label for="key">Your Finnhub API key (optional) / 个人 API Key</label><input id="key" type="password" autocomplete="off" spellcheck="false" maxlength="256" placeholder="Leave blank to keep the existing key"><small>Blank keeps the saved key. The normal market window cannot read it. Only the local service uses it. / 留空保留现有密钥。</small>
-<label><input id="persist" type="checkbox"> Save in system secure storage / 使用系统安全存储</label><small id="storage"></small>
+<label><input id="persist" type="checkbox"> Save in system secure storage / 使用系统安全存储</label><small id="storage"></small><button id="check-storage" type="button">Check / unlock system storage / 检查或解锁系统存储</button>
 <label><input id="forget" type="checkbox"> Remove the existing key / 删除现有 Key</label>
 <p>Enabling public feeds sends requests to third-party sources. Coverage can be partial, delayed or unavailable. This is not permission to redistribute market data. / 公开源仅供个人研究，可能限流或不可用。</p>
 <footer><button id="save" type="button">Apply and reconnect / 应用并重连</button><p id="result" role="status"></p></footer><script src="provider-settings.js"></script></body></html>

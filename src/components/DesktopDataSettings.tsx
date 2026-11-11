@@ -20,7 +20,7 @@ export function DesktopDataSettings() {
     <div className="space-y-3 p-3 text-[12px] text-ink-secondary">
       <p data-testid="desktop-data-mode"><strong>{status.mode === 'demo' ? (zh ? 'Demo · 模拟数据' : 'Demo · synthetic data') : status.mode === 'official' ? 'Finnhub · US quotes only' : (zh ? '公开行情 · 真实数据请求' : 'Public feeds · real source requests')}</strong></p>
       <p>{zh ? '延迟未经核实。连接状态表示本地传输，不代表交易所实时授权。历史图表按各数据源实际可用能力提供，失败不会回退到模拟数据。' : 'Latency unverified. Connected describes local transport, not exchange-grade real-time entitlement. Charts depend on provider capabilities; failures never fall back to synthetic data.'}</p>
-      <p>Finnhub: {status.configured ? (zh ? '已配置个人 Key' : 'Personal key configured') : (zh ? '未配置（可选）' : 'Not configured (optional)')} · {status.secureStorage ? (zh ? '系统安全存储可用' : 'System secure storage available') : (zh ? '仅本次会话，不保存明文' : 'Session only; plaintext persistence forbidden')}</p>
+      <p>Finnhub: {status.configured ? (zh ? '已配置个人 Key' : 'Personal key configured') : (zh ? '未配置（可选）' : 'Not configured (optional)')} · {status.secureStorage ? (zh ? '系统安全存储可用' : 'System secure storage available') : status.secureStorageChecked ? (zh ? '仅本次会话，不保存明文' : 'Session only; plaintext persistence forbidden') : (zh ? '未检查安全存储；公共行情不需要钥匙串权限' : 'Storage not checked; public feeds need no Keychain access')}</p>
       {status.issue ? <p role="alert">{status.issue}</p> : null}
       <div className="flex flex-wrap gap-2">
         <Button onClick={() => { void window.tomtraderDesktop?.configure(); }}>{zh ? '配置数据源 / Key' : 'Configure sources / Key'}</Button>

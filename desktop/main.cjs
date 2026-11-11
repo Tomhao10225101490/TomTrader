@@ -218,6 +218,7 @@ function installIPC() {
     } catch { /* Invalid renderer preference mirror ignored. */ }
   });
   ipcMain.handle('provider:status', (event) => { requireSender(event, trustedConfiguration); return publicStatus(); });
+  ipcMain.handle('provider:check-storage', async (event) => { requireSender(event, trustedConfiguration); await credentials.checkSecure(); return publicStatus(); });
   ipcMain.handle('provider:save', async (event, input) => {
     requireSender(event, trustedConfiguration);
     try {

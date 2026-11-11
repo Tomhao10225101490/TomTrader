@@ -22,8 +22,18 @@ function validateKey(value) {
 async function createCredentialStore(profile, safeStorage) {
   let sessionKey = '';
   let issue = null;
-  const secure = await safeStorage.isAsyncEncryptionAvailable().catch(() => false);
+  let secure = false;
+  let checked = false;
+  let probe;
+  async function checkSecure() {
+    if (checked && secure) return true;
+    if (!probe) probe = safeStorage.isAsyncEncryptionAvailable().catch(() => false).then((available) => { secure = Boolean(available); checked = true; return secure; }).finally(() => { probe = null; });
+    return probe;
+  }
   const encrypted = readSettings(profile).finnhubEncrypted;
+  // macOS may request native Keychain approval when a preview's code identity
+  // changes. Public feeds/session-only keys must not wait for that permission.
+  if (encrypted) await checkSecure();
   if (encrypted && !secure) issue = 'System secure storage is unavailable. Enter a key for this session or unlock your keychain.';
   else if (encrypted) {
     try {
@@ -37,10 +47,12 @@ async function createCredentialStore(profile, safeStorage) {
     get,
     status() {
       const configured = Boolean(get());
-      return { configured, persistent: Boolean(readSettings(profile).finnhubEncrypted), secureStorage: secure, issue };
+      return { configured, persistent: Boolean(readSettings(profile).finnhubEncrypted), secureStorage: secure, secureStorageChecked: checked, issue };
     },
+    checkSecure,
     async set(key, persist) {
       validateKey(key);
+      if (persist && key) await checkSecure();
       if (persist && key && !secure) throw new Error('Secure storage unavailable. Choose session only; plaintext storage is not allowed.');
       saveSettings(profile, { finnhubEncrypted: persist && key ? (await safeStorage.encryptStringAsync(key)).toString('base64') : null });
       sessionKey = key;
