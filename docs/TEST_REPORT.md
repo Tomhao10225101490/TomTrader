@@ -1,3 +1,11 @@
+# Latest verification — 2026-11-11 / 1.0.1-rc.2
+
+219 default Vitest passed /12 opt-in live tests skipped;50 production-browser cases passed. Type/lint/build passed. Native failure tests5/5 (isolated development), final DMG independent installed smoke13/13, final independent real CN/HK/US charts/restart and60s single-stream automatic updates passed. Fresh quote coverage remains20 CN /13 HK /38 US /22 indices /5 commodities. Eastmoney historical outage is preserved:33 direct failures; Tencent service fallback restored13/33 plans, with20 explicitly unavailable.
+
+Full current provenance, exact artifacts, evidence and limitations: [repair handoff](REPAIR_HANDOFF_2026-11-11.md). The historical report below is retained; its33/33 history result is **not** the present upstream availability claim.
+
+---
+
 # Test report — 2026-11-08
 
 Environment: macOS, Node v22.23.3, Next.js 16.4.5 production build, installed Google Chrome via Playwright. No market-data API key was configured.

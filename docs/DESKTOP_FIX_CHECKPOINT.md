@@ -1,3 +1,5 @@
+> **Current update: 2026-11-11 / 1.0.1-rc.2.** See [REPAIR_HANDOFF_2026-11-11.md](REPAIR_HANDOFF_2026-11-11.md) for the new tested installer and latest results. The following records the earlier RC1/audit stage.
+
 # Desktop corrective audit — 2026-11-11
 
 This checkpoint records source fixes after the 1.0.1-rc.1 handoff. The earlier signed/ad-hoc artifact hashes in `FINAL_HANDOFF.md` do not include these changes unless a new artifact is explicitly built and verified.

@@ -1,3 +1,5 @@
+> **Current update: 2026-11-11 / 1.0.1-rc.2.** See [REPAIR_HANDOFF_2026-11-11.md](REPAIR_HANDOFF_2026-11-11.md) for the new tested installer and latest results. The following records the earlier RC1/audit stage.
+
 # Local Mac RC — completed handoff checkpoint
 
 **Local Mac delivery is complete to the explicitly verified preview scope. Read `FINAL_HANDOFF.md` first.** Do not repeat packaging or claim deferred platform/security checks passed merely to make every box green.

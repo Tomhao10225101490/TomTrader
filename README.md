@@ -141,7 +141,7 @@ npm run verify:calendar
 npm run verify:free-feeds   # live keyless-feed re-check, in-memory DB, writes docs/evidence/free-feeds.json
 ```
 
-Verification snapshot at this commit (run from a clean copy): typecheck clean, **163 tests passed / 12 skipped** (the skips are the opt-in live-network checks), production build clean. The project's own acceptance history, performance numbers and raw run evidence are preserved under [docs/](docs/) — see [TEST_REPORT.md](docs/TEST_REPORT.md), [PERFORMANCE_REPORT.md](docs/PERFORMANCE_REPORT.md), [VISUAL_ACCEPTANCE.md](docs/VISUAL_ACCEPTANCE.md) and [docs/evidence/](docs/evidence/).
+Verification snapshot at this commit (run from a clean copy): typecheck clean, **219 tests passed / 12 skipped** (the skips are the opt-in live-network checks), production build clean. The current local repair also passed 50 browser cases, independently installed native smoke, and real CN/HK/US chart/restart/automatic-refresh checks; see [the 2026-11-11 handoff](docs/REPAIR_HANDOFF_2026-11-11.md). The project's own acceptance history, performance numbers and raw run evidence are preserved under [docs/](docs/) — see [TEST_REPORT.md](docs/TEST_REPORT.md), [PERFORMANCE_REPORT.md](docs/PERFORMANCE_REPORT.md), [VISUAL_ACCEPTANCE.md](docs/VISUAL_ACCEPTANCE.md) and [docs/evidence/](docs/evidence/).
 
 ## Project layout
 
