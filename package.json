@@ -1,6 +1,6 @@
 {
   "name": "tomtrader",
-  "version": "1.0.1-rc.1",
+  "version": "1.0.1-rc.2",
   "private": true,
   "description": "TomTrader — Global Markets, One View. Local-first market observation terminal.",
   "main": "desktop/main.cjs",

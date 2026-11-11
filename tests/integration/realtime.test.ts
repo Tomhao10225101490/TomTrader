@@ -51,6 +51,23 @@ describe('stream hub', () => {
     }, { timeout: 2000 });
   });
 
+  it('replays an unchanged cached snapshot to a second tab and immediately after resume', async () => {
+    const first: SseFrame[] = [];
+    const second: SseFrame[] = [];
+    connect('replay-first', (frame) => first.push(frame));
+    subscribe('replay-first', ['equity:US:AAPL']);
+    await vi.waitFor(() => expect(first.some((frame) => frame.quotes?.some((s) => s.quote))).toBe(true));
+    const initial = first.flatMap((frame) => frame.quotes ?? []).find((s) => s.quote)!;
+
+    connect('replay-second', (frame) => second.push(frame));
+    subscribe('replay-second', ['equity:US:AAPL']);
+    await vi.waitFor(() => expect(second.some((frame) => frame.quotes?.some((s) => s.quote?.receivedAt === initial.quote!.receivedAt))).toBe(true));
+    setPaused('replay-second', true);
+    second.length = 0;
+    setPaused('replay-second', false);
+    await vi.waitFor(() => expect(second.some((frame) => frame.quotes?.some((s) => s.quote?.receivedAt === initial.quote!.receivedAt))).toBe(true));
+  });
+
   it('de-duplicates a subscription shared by two clients', () => {
     connect('c-a', () => undefined);
     connect('c-b', () => undefined);
@@ -95,5 +112,11 @@ describe('stream hub', () => {
 
     const chinaMorning = Date.parse('2026-11-09T02:00:00Z'); // Shanghai open
     expect(desiredInterval(['index:CN:000001'], chinaMorning)).toBeLessThanOrEqual(10_000);
+
+    // A closed-market five-minute schedule must wake for the actual open.
+    const beforeOpen = Date.parse('2026-11-11T01:29:59Z');
+    expect(desiredInterval(['index:CN:000001'], beforeOpen)).toBeLessThanOrEqual(1_000);
+    const beforeResume = Date.parse('2026-11-11T04:59:59Z');
+    expect(desiredInterval(['index:CN:000001'], beforeResume)).toBeLessThanOrEqual(1_000);
   });
 });

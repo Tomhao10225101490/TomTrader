@@ -9,7 +9,7 @@ process.env.TOMTRADER_DEMO = '0';
 const { UNIVERSE, ALL_INDEX_IDS, instrumentById } = await import('../src/server/instruments');
 const { eastmoney } = await import('../src/server/providers/eastmoney');
 const { tencent, tencentCode } = await import('../src/server/providers/tencent');
-const { refreshQuotes } = await import('../src/server/service');
+const { refreshQuotes, getBars } = await import('../src/server/service');
 const { classifyFreshness } = await import('../src/server/freshness');
 const { getMarketStatus } = await import('../src/server/marketstatus');
 const startedAt = Date.now();
@@ -37,11 +37,13 @@ const plans: [string, '1D'|'5D'|'1M'|'1Y', '5m'|'15m'|'1d'][] = [];
 for (const id of ['equity:CN:600519', 'equity:HK:00700', 'equity:US:AAPL']) {
   plans.push([id,'1D','5m'],[id,'5D','15m'],[id,'1M','1d'],[id,'1Y','1d']);
 }
-for (const id of ALL_INDEX_IDS) if (instrumentById(id)?.providerSymbols?.eastmoney) plans.push([id,'1M','1d']);
+for (const id of (process.env.TOMTRADER_HISTORY_SCOPE === 'core' ? [] : ALL_INDEX_IDS)) if (instrumentById(id)?.providerSymbols?.eastmoney) plans.push([id,'1M','1d']);
 for (const [id, range, interval] of plans) {
   const instrument = instrumentById(id)!;
   const start = performance.now();
-  const result = await eastmoney.getHistoricalBars(instrument, range, interval);
+  const result = process.env.TOMTRADER_DIRECT_HISTORY === '1'
+    ? await eastmoney.getHistoricalBars(instrument, range, interval)
+    : await getBars(id, range, interval, { await: true }).then(({ bars, issue }) => bars ? { ok: true as const, data: bars } : { ok: false as const, reason: issue ?? 'unavailable', message: 'The configured real-provider history chain returned no bars' });
   if (result.ok) {
     const bars = result.data.bars;
     if (!bars.every((b, n) => Number.isFinite(b.close) && b.high >= Math.max(b.open,b.close) && b.low <= Math.min(b.open,b.close) && (n === 0 || b.time > bars[n-1].time))) throw new Error(`Invalid OHLCV/order: ${id} ${range}`);
@@ -62,10 +64,16 @@ const coverage = ['CN','HK','US','indices','commodities'].map((market) => {
   const rows = quoteRows.filter((r) => market === 'indices' ? r.assetType === 'index' : market === 'commodities' ? r.assetType === 'commodity' : r.market === market && ['equity', 'etf'].includes(r.assetType));
   return { market, requested: rows.length, available: rows.filter((r) => r.quote).length, missing: rows.filter((r) => !r.quote).map((r) => r.id) };
 });
-const evidence = { startedAt, completedAt: Date.now(), mode: 'real-network, isolated in-memory DB, no key, no demo, no persisted quotes', quoteSources, pipelineElapsedMs, coverage, quoteRows, histories, comparisons };
+const evidence = { historyMethod: process.env.TOMTRADER_DIRECT_HISTORY === '1' ? 'direct-eastmoney' : 'real-service-fallback-chain', historyScope: process.env.TOMTRADER_HISTORY_SCOPE ?? 'all', startedAt, completedAt: Date.now(), mode: 'real-network, isolated in-memory DB, no key, no demo, no persisted quotes', quoteSources, pipelineElapsedMs, coverage, quoteRows, histories, comparisons };
 const evidenceDirectory = process.env.TOMTRADER_EVIDENCE_DIR || 'docs/evidence';
 fs.mkdirSync(evidenceDirectory, { recursive: true });
-fs.writeFileSync(`${evidenceDirectory}/free-feeds.json`, JSON.stringify(evidence,null,2));
+const target = `${evidenceDirectory}/free-feeds.json`;
+if (fs.existsSync(target)) {
+  const previous = JSON.parse(fs.readFileSync(target, 'utf8'));
+  const archived = `${evidenceDirectory}/free-feeds-before-fallback.json`;
+  if (previous.histories?.length && previous.histories.every((h: { ok: boolean }) => !h.ok) && !fs.existsSync(archived)) fs.copyFileSync(target, archived);
+}
+fs.writeFileSync(target, JSON.stringify(evidence,null,2));
 console.log(JSON.stringify({coverage, historiesPassed:histories.filter((h)=>h.ok).length, historiesRequested:histories.length}));
 for (const market of ['CN','HK','US']) if (!coverage.find((c)=>c.market===market)?.available) process.exitCode=1;
 for (const id of ['equity:CN:600519','equity:HK:00700','equity:US:AAPL']) if (!histories.some((h)=>h.id===id&&h.range==='1M'&&h.ok)) process.exitCode=1;

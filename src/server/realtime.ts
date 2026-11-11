@@ -34,6 +34,8 @@ interface Client {
   connectedAt: number;
   /** Tabs that are `document.hidden` ask us to stop feeding them. */
   paused: boolean;
+  /** Each connection needs its own first snapshot, even when another tab has it. */
+  pendingReplay: Set<string>;
 }
 
 interface Hub {
@@ -89,7 +91,7 @@ export function registerAlertSource(
 
 export function attach(clientId: string, send: Listener, close: () => void): { subscribed: Set<string> } {
   const h = hub();
-  const client: Client = { id: clientId, send, close, subscribed: new Set(), connectedAt: Date.now(), paused: false };
+  const client: Client = { id: clientId, send, close, subscribed: new Set(), connectedAt: Date.now(), paused: false, pendingReplay: new Set() };
   h.clients.get(clientId)?.close();
   h.clients.set(clientId, client);
   startLoop();
@@ -121,6 +123,8 @@ export function subscribe(clientId: string, ids: string[]): { added: string[]; t
   const wanted = new Set(ids.slice(0, 400));
   const added = [...wanted].filter((id) => !client.subscribed.has(id));
   client.subscribed = wanted;
+  for (const id of added) client.pendingReplay.add(id);
+  for (const id of client.pendingReplay) if (!wanted.has(id)) client.pendingReplay.delete(id);
   startLoop();
   // A subscription that arrives right after attach used to wait for the next
   // scheduled tick — up to 15 seconds of blank cells. Ask for a pass now.
@@ -145,7 +149,13 @@ function requestImmediateTick(): void {
 
 export function setPaused(clientId: string, paused: boolean): void {
   const client = hub().clients.get(clientId);
-  if (client) client.paused = paused;
+  if (!client) return;
+  const wasPaused = client.paused;
+  client.paused = paused;
+  if (wasPaused && !paused) {
+    for (const id of client.subscribed) client.pendingReplay.add(id);
+    requestImmediateTick();
+  }
 }
 
 /**
@@ -237,16 +247,18 @@ function schedule(intervalMs: number): void {
 export function desiredInterval(ids: string[], now = Date.now()): number {
   let cnOpen = false;
   let otherOpen = false;
+  let untilNextOpen = 5 * 60_000;
   for (const id of ids) {
     const instrument = resolveInstrument(id);
     const market = instrument?.market ?? id.split(':')[1];
     const status = marketStatusFor(instrument?.exchange ?? statusExchange(market), now);
+    if (status.nextOpenAt && status.nextOpenAt > now) untilNextOpen = Math.min(untilNextOpen, status.nextOpenAt - now);
     if (status.state === 'open') {
       if (market === 'CN' || market === 'HK') cnOpen = true;
       else otherOpen = true;
     }
   }
-  if (!cnOpen && !otherOpen) return 5 * 60_000;
+  if (!cnOpen && !otherOpen) return Math.max(250, untilNextOpen);
   if (cnOpen && !otherOpen) return TTL.quoteOpenCn;
   return TTL.quoteOpen;
 }
@@ -316,6 +328,17 @@ async function tick(_reason: 'attach' | 'schedule'): Promise<void> {
     h.lastRefreshAt = Date.now();
     h.consecutiveErrors = 0;
     if (changed.length) broadcast({ type: 'quotes', at: Date.now(), quotes: changed });
+    // Global change detection cannot provide a first frame to a second tab:
+    // unchanged snapshots still need replay on subscribe, reconnect or resume.
+    for (const client of h.clients.values()) {
+      if (client.paused) continue;
+      const quotes = snapshots.filter((snap) => client.pendingReplay.has(snap.instrument.id));
+      if (!quotes.length) continue;
+      try {
+        client.send({ type: 'quotes', at: Date.now(), quotes });
+        for (const snap of quotes) client.pendingReplay.delete(snap.instrument.id);
+      } catch { /* leave the replay pending until a successful send */ }
+    }
 
     await evaluateAlerts(snapshots);
   } catch (e) {
@@ -340,7 +363,10 @@ function broadcast(frame: SseFrame): void {
     try {
       if (frame.type === 'quotes') {
         const quotes = frame.quotes?.filter((s) => c.subscribed.has(s.instrument.id)) ?? [];
-        if (quotes.length) c.send({ ...frame, quotes });
+        if (quotes.length) {
+          c.send({ ...frame, quotes });
+          for (const snap of quotes) c.pendingReplay.delete(snap.instrument.id);
+        }
       } else c.send(frame);
     } catch {
       /* a broken pipe is cleaned up by the route's abort handler */

@@ -38,31 +38,43 @@ export default function PortfolioPage() {
   const now = useNow(30_000);
   const [addOpen, setAddOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  const [refreshTick, setRefreshTick] = useState(0);
-  const lastStamp = useRef(0);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [removing, setRemoving] = useState<string | null>(null);
+  const refreshPolicy = usePrefs((s) => s.refreshPolicy);
   const lastRefresh = useRef(0);
 
   const load = useAsync(
-    useCallback(async () => (await api.portfolio.get(valuation)).data as PortfolioSummary | null, [valuation]),
-    [valuation, refreshTick],
+    useCallback(async () => {
+      const response = await api.portfolio.get(valuation);
+      if (response.error || !response.data) throw new Error(response.error ?? 'Portfolio request failed');
+      return response.data as PortfolioSummary;
+    }, [valuation]),
+    [valuation],
+    { keepData: true },
   );
 
   const data = load.data;
+  const { loading: valuating, reload: revalue } = load;
   const ids = useMemo(() => (data?.positions ?? []).map((p) => p.instrument.id), [data]);
   useInterest(ids);
 
-  // Live prices arrive over the stream. When their exchange timestamps move we
-  // re-request the valuation so the totals and the tape cannot drift apart;
-  // the 20s floor keeps that from becoming a polling loop.
+  // Keep each displayed price and its valuation from the same server response.
+  // A newer stream snapshot schedules a trailing refresh, including feeds that
+  // omit source timestamps. Do not drop the final update inside the 20s floor.
+  const needsRefresh = (data?.positions ?? []).some((position) => {
+    const incoming = snapshots[position.instrument.id]?.quote;
+    const used = position.quote?.quote;
+    return incoming && (!used || incoming.receivedAt > used.receivedAt)
+      && (!used || incoming.last !== used.last || incoming.quality !== used.quality || incoming.provider !== used.provider);
+  });
   useEffect(() => {
-    let stamps = 0;
-    for (const id of ids) stamps += snapshots[id]?.quote?.exchangeTimestamp ?? 0;
-    if (!stamps || stamps === lastStamp.current) return;
-    if (lastStamp.current && Date.now() - lastRefresh.current < 20_000) return;
-    lastStamp.current = stamps;
-    lastRefresh.current = Date.now();
-    setRefreshTick((n) => n + 1);
-  }, [snapshots, ids]);
+    if (!needsRefresh || valuating || refreshPolicy === 'off' || document.hidden) return;
+    const timer = setTimeout(() => {
+      lastRefresh.current = Date.now();
+      revalue();
+    }, Math.max(0, 20_000 - (Date.now() - lastRefresh.current)));
+    return () => clearTimeout(timer);
+  }, [needsRefresh, valuating, revalue, refreshPolicy, now]);
 
   const positions = data?.positions ?? [];
   const valued = positions.filter((p) => p.marketValue !== null);
@@ -84,7 +96,7 @@ export default function PortfolioPage() {
           <Button size="sm" onClick={() => setImportOpen(true)}>
             <Upload size={12} /> {t('portfolio.import')}
           </Button>
-          <ExportButton />
+          <ExportButton onError={setActionError} />
           <Button size="sm" variant="primary" onClick={() => setAddOpen(true)}>
             <Plus size={12} /> {t('portfolio.addHolding')}
           </Button>
@@ -93,7 +105,8 @@ export default function PortfolioPage() {
     >
       <p className="text-[10.5px] text-ink-faint"><a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer">Rates By Exchange Rate API</a> · {locale === 'zh' ? '每日参考汇率 · 盈亏按当前汇率折算成本和市值，不含历史汇兑收益' : 'Daily reference FX · cost and value translated at current FX; historical currency return excluded'}</p>
       {load.loading && !data ? <Spinner label={t('common.loading')} /> : null}
-      {load.error && !data ? <ErrorState title={t('common.error')} body={load.error} onRetry={load.reload} /> : null}
+      {actionError ? <p role="alert" className="text-[11.5px] text-[var(--t-down)]">{actionError}</p> : null}
+      {load.error ? <ErrorState title={t('common.error')} body={load.error} onRetry={load.reload} /> : null}
 
       {data && positions.length === 0 ? (
         <Block flush>
@@ -160,7 +173,7 @@ export default function PortfolioPage() {
                 </thead>
                 <tbody>
                   {positions.map((p) => {
-                    const live = snapshots[p.instrument.id] ?? p.quote;
+                    const live = p.quote;
                     return (
                       <tr key={p.id} className="border-b border-line-faint last:border-b-0 hover:bg-surface-alt">
                         <td className="px-3 py-[6px]">
@@ -197,9 +210,15 @@ export default function PortfolioPage() {
                             type="button"
                             title={t('portfolio.remove')}
                             aria-label={t('portfolio.remove')}
+                            disabled={removing !== null}
                             onClick={async () => {
-                              await api.portfolio.post({ op: 'remove', id: p.id });
-                              load.reload();
+                              if (removing) return;
+                              setActionError(null);
+                              setRemoving(p.id);
+                              const result = await api.portfolio.post({ op: 'remove', id: p.id });
+                              setRemoving(null);
+                              if (result.error) setActionError(result.error);
+                              else load.reload();
                             }}
                             className="rounded-[2px] p-1 text-ink-faint hover:text-[var(--t-down)]"
                           >
@@ -371,14 +390,15 @@ function AddHolding({ open, onClose, onSaved }: { open: boolean; onClose: () => 
   );
 }
 
-function ExportButton() {
+function ExportButton({ onError }: { onError: (message: string | null) => void }) {
   const { t } = useI18n();
   return (
     <Button
       size="sm"
       onClick={async () => {
+        onError(null);
         const res = await api.portfolio.post({ op: 'export' });
-        if (!res.data) return;
+        if (res.error || !res.data) { onError(res.error ?? 'Export failed'); return; }
         const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -396,6 +416,8 @@ function ExportButton() {
 function ImportDialog({ open, onClose, onDone, t }: { open: boolean; onClose: () => void; onDone: () => void; t: (k: never, v?: Record<string, string | number>) => string }) {
   const [text, setText] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const submitting = useRef(false);
   return (
     <Modal
       open={open}
@@ -407,20 +429,26 @@ function ImportDialog({ open, onClose, onDone, t }: { open: boolean; onClose: ()
           <Button
             size="sm"
             variant="primary"
+            disabled={busy}
             onClick={async () => {
-              let parsed: { holdings?: unknown[] };
+              if (submitting.current) return;
+              let parsed: unknown;
               try {
                 parsed = JSON.parse(text);
               } catch {
                 setMessage('invalid JSON');
                 return;
               }
-              const holdings = Array.isArray(parsed.holdings) ? parsed.holdings : [];
+              const holdings = parsed && typeof parsed === 'object' && 'holdings' in parsed && Array.isArray(parsed.holdings) ? parsed.holdings : [];
               if (!holdings.length) {
                 setMessage('no holdings array');
                 return;
               }
+              submitting.current = true;
+              setBusy(true);
               const res = await api.portfolio.post({ op: 'import', holdings });
+              submitting.current = false;
+              setBusy(false);
               setMessage(res.error ?? t('portfolio.imported' as never, { n: holdings.length }));
               if (!res.error) {
                 onDone();

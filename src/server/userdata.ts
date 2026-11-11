@@ -160,6 +160,20 @@ export function addHolding(input: {
   return row;
 }
 
+/** All-or-nothing import: a failed row must not leave an unreported partial import. */
+export function importHoldings(inputs: Parameters<typeof addHolding>[0][]): HoldingRow[] {
+  const db = getDb();
+  db.exec('BEGIN');
+  try {
+    const rows = inputs.map(addHolding);
+    db.exec('COMMIT');
+    return rows;
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
+}
+
 export function updateHolding(
   id: string,
   input: Partial<{ quantity: number; averageCost: number; currency: string; purchasedAt: string; note: string; instrumentId: string }>,

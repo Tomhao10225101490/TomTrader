@@ -186,28 +186,24 @@ export class EastmoneyProvider implements MarketDataProvider {
         const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/.exec(stamp ?? '');
         if (!m) continue;
         const [, y, mo, d, hh, mi] = m;
-        bars.push({
-          // utcFromLocalDate answers in ms; Bar.time is epoch seconds UTC.
-          time: Math.round(utcFromLocalDate(tz, `${y}-${mo}-${d}`, Number(hh) * 60 + Number(mi)) / 1000),
-          open: Number(open),
-          high: Number(high),
-          low: Number(low),
-          close: Number(close),
-          volume: Number.isFinite(Number(vol)) ? Number(vol) * (instrument.market === 'CN' ? 100 : 1) : null,
-        });
+        // utcFromLocalDate answers in ms; Bar.time is epoch seconds UTC.
+        const time = Math.round(utcFromLocalDate(tz, `${y}-${mo}-${d}`, Number(hh) * 60 + Number(mi)) / 1000);
+        const bar = parseBar(time, open, close, high, low, vol, instrument.market === 'CN');
+        if (bar) bars.push(bar);
       }
-      if (bars.length < 2) return err('not-found', `${instrument.id}: no intraday trend data`);
+      const selected = normalizeBars(bars);
+      if (selected.length < 2) return err('not-found', `${instrument.id}: no valid intraday trend data`);
       return ok({
         instrumentId: instrument.id,
         range,
         interval,
         adjusted: false,
         adjustment: 'raw',
-        bars,
+        bars: selected,
         meta: {
           currency: instrument.currency,
           exchangeTimezone: tz,
-          lastBarAt: bars[bars.length - 1].time,
+          lastBarAt: selected[selected.length - 1].time,
           receivedAt: Date.now(),
           tier: this.declaredTier(instrument.market),
           provider: 'eastmoney',
@@ -243,19 +239,14 @@ export class EastmoneyProvider implements MarketDataProvider {
       if (!day) continue;
       const local = `${day[1]}-${day[2]}-${day[3]}`;
       const intradayStamp = /\ (\d{2}):(\d{2})/.exec(stamp ?? '');
-      bars.push({
-        time: Math.round(
-          utcFromLocalDate(tz, local, intradayStamp ? Number(intradayStamp[1]) * 60 + Number(intradayStamp[2]) : 0) / 1000,
-        ),
-        open: Number(open),
-        close: Number(close),
-        high: Number(high),
-        low: Number(low),
-        volume: Number.isFinite(Number(vol)) ? Number(vol) * (instrument.market === 'CN' ? 100 : 1) : null,
-      });
+      const time = Math.round(
+        utcFromLocalDate(tz, local, intradayStamp ? Number(intradayStamp[1]) * 60 + Number(intradayStamp[2]) : 0) / 1000,
+      );
+      const bar = parseBar(time, open, close, high, low, vol, instrument.market === 'CN');
+      if (bar) bars.push(bar);
     }
     if (bars.length < 2) return err('not-found', `${instrument.id}: insufficient history`);
-    const valid = bars.filter(validBar).sort((a, b) => a.time - b.time);
+    const valid = normalizeBars(bars);
     const selected = selectHistoryWindow(valid, range, interval, Date.now(), tz);
     if (selected.length < 2) return err('not-found', `${instrument.id}: insufficient valid bars for ${range}`);
 
@@ -307,10 +298,23 @@ export const eastmoney = new EastmoneyProvider();
 
 
 export function parseEastmoneyNumber(value: unknown): number | null {
-  if (value === null || value === undefined || value === '' || value === '-') return null;
+  if (value === null || value === undefined || (typeof value === 'string' && ['', '-'].includes(value.trim()))) return null;
   if (typeof value !== 'number' && typeof value !== 'string') return null;
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
+}
+
+function parseBar(time: number, open: string | undefined, close: string | undefined, high: string | undefined, low: string | undefined, volume: string | undefined, lots: boolean): Bar | null {
+  const o = parseEastmoneyNumber(open), c = parseEastmoneyNumber(close), h = parseEastmoneyNumber(high), l = parseEastmoneyNumber(low);
+  if (o === null || c === null || h === null || l === null) return null;
+  const v = parseEastmoneyNumber(volume);
+  const bar: Bar = { time, open: o, close: c, high: h, low: l, volume: v !== null && v >= 0 ? v * (lots ? 100 : 1) : null };
+  return validBar(bar) ? bar : null;
+}
+
+/** Chart libraries require strictly ordered, unique instants. */
+function normalizeBars(bars: Bar[]): Bar[] {
+  return [...new Map(bars.filter(validBar).map((bar) => [bar.time, bar])).values()].sort((a, b) => a.time - b.time);
 }
 
 function validBar(bar: Bar): boolean {

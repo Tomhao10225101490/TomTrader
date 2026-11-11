@@ -10,8 +10,8 @@ export function LiveProvider({ children }: { children: ReactNode }) {
   const setPolicy = useLive((s) => s.setRefreshPolicy);
 
   useEffect(() => {
-    init();
     setPolicy(policy);
+    init();
   }, [policy, init, setPolicy]);
 
   useEffect(() => {

@@ -1,7 +1,8 @@
 import { EXCHANGES } from '../exchanges';
-import { raw } from '../http';
+import { fetchJson,raw } from '../http';
 import { utcFromLocalDate } from '../marketstatus';
 import type {
+Bar,
 BarInterval,
 BarRange,
 Bars,
@@ -14,6 +15,7 @@ Quote,
 import { err,ok } from '../types';
 import { publicFeedsEnabled } from './access';
 import type { MarketDataProvider } from './provider';
+import { parseEastmoneyNumber,selectHistoryWindow } from './eastmoney';
 
 /**
  * Tencent (qt.gtimg.cn) — third independent quote source.
@@ -34,14 +36,18 @@ import type { MarketDataProvider } from './provider';
  */
 
 const BASE = 'https://qt.gtimg.cn/q=';
+const HISTORY_BASE = 'https://web.ifzq.gtimg.cn/appstock/app/';
+// The quote supplies authoritative US listing suffixes (AAPL.OQ, SPY.P,
+// BRK.B.N). Omitting one can return two unrelated points rather than history.
+const historyCodes = new Map<string, string>();
 
 export class TencentProvider implements MarketDataProvider {
   readonly id = 'tencent' as const;
-  readonly label = 'Tencent quote feed (public web endpoint)';
+  readonly label = 'Tencent quotes and daily+ history (public web endpoints)';
   readonly markets: MarketCode[] = ['US', 'CN', 'HK', 'GB'];
   readonly capabilities = {
     quotes: true,
-    historicalBars: false,
+    historicalBars: true,
     search: false,
     metadata: false,
     push: false,
@@ -71,15 +77,49 @@ export class TencentProvider implements MarketDataProvider {
         const hit = chunk.find((c) => c.code === line.key);
         if (!hit) continue;
         const quote = parseRow(hit.i, line);
-        if (quote) out.push(quote);
+        if (quote) {
+          out.push(quote);
+          const canonical = line.fields[2];
+          if (hit.i.market === 'US' && canonical && /^[A-Za-z0-9./-]+\.[A-Z]{1,3}$/.test(canonical)) historyCodes.set(hit.i.id, `us${canonical}`);
+        }
       }
     }
     return ok(out);
   }
 
-  async getHistoricalBars(instrument: Instrument, _range: BarRange, _interval: BarInterval): Promise<CapabilityResult<Bars>> {
+  async getHistoricalBars(instrument: Instrument, range: BarRange, interval: BarInterval): Promise<CapabilityResult<Bars>> {
     if (!publicFeedsEnabled()) return err('unsupported', 'Public adapter disabled; confirm data rights before enabling TOMTRADER_PUBLIC_FEEDS.');
-    return err('unsupported', `Tencent history is not wired into TomTrader (${instrument.id}); use Yahoo or Eastmoney`);
+    if (!['1d', '1wk', '1mo'].includes(interval)) return err('unsupported', 'Tencent fallback supplies daily, weekly and monthly bars only; no verified intraday OHLC endpoint.');
+    let code = tencentCode(instrument);
+    if (!code || !['CN', 'HK', 'US'].includes(instrument.market)) return err('unsupported', `No Tencent history mapping for ${instrument.id}`);
+    if (instrument.market === 'US') {
+      if (!historyCodes.has(instrument.id)) {
+        const quote = await this.getQuotes([instrument]);
+        if (!quote.ok) return quote;
+      }
+      code = historyCodes.get(instrument.id) ?? null;
+      if (!code) return err('unsupported', `Tencent did not supply a canonical US listing code for ${instrument.id}`);
+    }
+    const period = { '1d': 'day', '1wk': 'week', '1mo': 'month' }[interval as '1d'|'1wk'|'1mo'];
+    const count = { '1D': 5, '5D': 10, '1M': 40, '3M': 80, '6M': 150, YTD: 320, '1Y': 320, '5Y': 320, MAX: 640 }[range];
+    const endpoint = instrument.market === 'US' ? 'usfqkline/get' : instrument.market === 'HK' ? 'hkfqkline/get' : 'fqkline/get';
+    const response = await fetchJson<{ code?: number; msg?: string; data?: Record<string, Record<string, unknown>> }>(HISTORY_BASE + endpoint, {
+      query: { param: `${code},${period},,,${count},qfq` }, retries: 2, timeoutMs: 12_000,
+    });
+    if (!response.ok) return err(response.error.kind === 'rate-limit' ? 'rate-limited' : 'network', response.error.message, response.error.retryAfterMs);
+    if (response.data.code !== 0) return err('not-found', response.data.msg ?? 'Tencent returned no history');
+    const payload = response.data.data?.[code];
+    const adjustedRows = payload?.[`qfq${period}`];
+    const adjusted = Array.isArray(adjustedRows);
+    const rows = adjusted ? adjustedRows : payload?.[period];
+    if (!Array.isArray(rows)) return err('not-found', `${instrument.id}: Tencent returned no ${period} series`);
+    const timezone = EXCHANGES[instrument.exchange].timezone;
+    const volumeMultiplier = instrument.market === 'CN' ? (/^sh68[89]/.test(code) ? 1 : 100) : null;
+    const parsed = parseTencentHistory(rows, timezone, volumeMultiplier);
+    const bars = selectHistoryWindow(parsed, range, interval, Date.now(), timezone);
+    if (bars.length < 2) return err('not-found', `${instrument.id}: insufficient valid Tencent ${range} bars`);
+    return ok({ instrumentId: instrument.id, range, interval, adjusted, adjustment: adjusted ? 'dividend-adjusted' : 'raw', bars,
+      meta: { provider: 'tencent', tier: 'unverified', currency: instrument.currency, exchangeTimezone: timezone, receivedAt: Date.now(), lastBarAt: bars.at(-1)!.time } });
   }
 }
 
@@ -208,3 +248,22 @@ export function tencentCode(instrument: Instrument): string | null {
 }
 
 export const tencent = new TencentProvider();
+
+
+/** Tencent daily+ rows are [date, open, close, high, low, volume, ...]. */
+export function parseTencentHistory(rows: unknown[], timezone: string, volumeMultiplier: 1 | 100 | null): Bar[] {
+  const unique = new Map<number, Bar>();
+  for (const row of rows) {
+    if (!Array.isArray(row) || row.length < 5 || typeof row[0] !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(row[0])) continue;
+    const isoDate = new Date(`${row[0]}T00:00:00Z`);
+    if (!Number.isFinite(isoDate.getTime()) || isoDate.toISOString().slice(0, 10) !== row[0]) continue;
+    const [o, c, h, l] = row.slice(1, 5).map(parseEastmoneyNumber);
+    if (o === null || c === null || h === null || l === null || ![o, c, h, l].every(Number.isFinite) || h < Math.max(o, c) || l > Math.min(o, c)) continue;
+    const time = Math.round(utcFromLocalDate(timezone, row[0], 0) / 1000);
+    const volume = parseEastmoneyNumber(row[5]);
+    // AKShare documents CN lots except sh688/sh689, which already use shares.
+    // HK/US volume units remain unknown instead of being guessed.
+    unique.set(time, { time, open: o, close: c, high: h, low: l, volume: volumeMultiplier !== null && volume !== null && volume >= 0 ? volume * volumeMultiplier : null });
+  }
+  return [...unique.values()].sort((a, b) => a.time - b.time);
+}

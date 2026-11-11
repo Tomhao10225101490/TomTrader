@@ -1,4 +1,7 @@
 const net = require('node:net');
+const fs = require('node:fs');
+const path = require('node:path');
+const { randomUUID } = require('node:crypto');
 
 function reservePort() {
   return new Promise((resolve, reject) => {
@@ -41,4 +44,31 @@ function isExternalUrl(value) {
   } catch { return false; }
 }
 
-module.exports = { reservePort, serverEnvironment, isInternalUrl, isExternalUrl };
+/** Save As must never replace files used by the running profile. */
+function isProtectedBackupPath(filePath, profile) {
+  const canonical = (directory) => { try { return fs.realpathSync(directory); } catch { return path.resolve(directory); } };
+  const root = canonical(profile);
+  const destination = path.join(canonical(path.dirname(filePath)), path.basename(filePath));
+  const relative = path.relative(root, destination);
+  return relative === '' || (!relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative));
+}
+
+/** Replace a chosen backup only after the complete snapshot is on disk. */
+function writeBackup(filePath, bytes) {
+  const temporary = path.join(path.dirname(filePath), `.${path.basename(filePath)}.${randomUUID()}.tmp`);
+  let descriptor, created = false;
+  try {
+    descriptor = fs.openSync(temporary, 'wx', 0o600);
+    created = true;
+    fs.writeFileSync(descriptor, bytes);
+    fs.fsyncSync(descriptor);
+    fs.closeSync(descriptor);
+    descriptor = undefined;
+    fs.renameSync(temporary, filePath);
+  } finally {
+    if (descriptor !== undefined) { try { fs.closeSync(descriptor); } catch { /* Preserve original error. */ } }
+    if (created) { try { fs.unlinkSync(temporary); } catch { /* Renamed or failed cleanup; original target is intact. */ } }
+  }
+}
+
+module.exports = { reservePort, serverEnvironment, isInternalUrl, isExternalUrl, isProtectedBackupPath, writeBackup };

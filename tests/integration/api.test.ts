@@ -354,3 +354,53 @@ describe('mutation regression contracts', () => {
     expect((await post('/api/portfolio', { op: 'import', holdings: [holding] })).status).toBe(200);
   });
 });
+
+describe('portfolio integrity regressions', () => {
+  it('infers omitted holding defaults from the actual trading instrument', async () => {
+    const added = await post('/api/portfolio', { op: 'add', instrumentId: 'equity:CN:600519', quantity: 2, averageCost: 1400 });
+    expect(added.status).toBe(200);
+    expect(added.body.currency).toBe('CNY');
+    expect(added.body.purchased_at).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    const imported = await post('/api/portfolio', { op: 'import', holdings: [{ instrumentId: 'equity:HK:00700', quantity: 2, averageCost: 300, note: null }] });
+    expect(imported.status).toBe(200);
+    expect(imported.body[0].currency).toBe('HKD');
+  });
+
+  it('rejects bad import rows before any data is saved', async () => {
+    const { listHoldings } = await import('@/server/userdata');
+    const before = listHoldings();
+    const result = await post('/api/portfolio', { op: 'import', holdings: [
+      { instrumentId: 'equity:US:AAPL', quantity: 1, averageCost: 100 },
+      { instrumentId: 'equity:US:AAPL', quantity: 1, averageCost: 100, note: { wrong: 'type' } },
+    ] });
+    expect(result.status).toBe(400);
+    expect(listHoldings()).toEqual(before);
+  });
+
+  it('rolls the entire import back if a database write fails halfway', async () => {
+    const { getDb } = await import('@/server/db');
+    const { listHoldings } = await import('@/server/userdata');
+    const before = listHoldings();
+    getDb().exec("CREATE TEMP TRIGGER reject_import BEFORE INSERT ON holding WHEN NEW.note = 'fail-import' BEGIN SELECT RAISE(ABORT, 'Injected write failure'); END;");
+    try {
+      const result = await post('/api/portfolio', { op: 'import', holdings: [
+        { instrumentId: 'equity:US:AAPL', quantity: 1, averageCost: 100 },
+        { instrumentId: 'equity:US:MSFT', quantity: 1, averageCost: 100, note: 'fail-import' },
+      ] });
+      expect(result.status).toBe(500);
+      expect(listHoldings()).toEqual(before);
+    } finally { getDb().exec('DROP TRIGGER reject_import'); }
+  });
+
+  it('cannot hide or misprice a saved holding through invalid updates', async () => {
+    const created = await post('/api/portfolio', { op: 'add', instrumentId: 'equity:US:AAPL', quantity: 1, averageCost: 100 });
+    expect(created.status).toBe(200);
+    for (const patch of [{ instrumentId: 'not-an-instrument' }, { currency: 'CNY' }, { instrumentId: 'equity:CN:600519' }, { quantity: true }, { purchasedAt: '' }]) {
+      const result = await post('/api/portfolio', { op: 'update', id: created.body.id, ...patch });
+      expect(result.status).toBe(400);
+    }
+    const { listHoldings } = await import('@/server/userdata');
+    expect(listHoldings().find((h) => h.id === created.body.id)).toEqual(created.body);
+    expect((await post('/api/portfolio', { op: 'update', id: 'missing', quantity: 1 })).status).toBe(404);
+  });
+});

@@ -5,7 +5,9 @@ import os from 'node:os';
 
 const version = JSON.parse(await readFile('package.json', 'utf8')).version;
 const root = process.cwd();
-await mkdir(path.join(root, 'test-results/desktop'), { recursive: true });
+const reportDirectory = path.resolve(process.env.TOMTRADER_DESKTOP_REPORT_DIR || 'test-results/desktop');
+const releaseDirectory = path.resolve(process.env.TOMTRADER_RELEASE_DIR || 'release');
+await mkdir(reportDirectory, { recursive: true });
 const temporary = await mkdtemp(path.join(os.tmpdir(), 'TomTrader-install-'));
 const report = { version, platform: process.platform, arch: process.arch, installerGenerated: false, installerInstalled: false, installedAppPassed: false };
 let mount, installation;
@@ -25,7 +27,7 @@ async function readonly(directory) {
 }
 try {
   if (process.platform === 'darwin') {
-    const dmg = path.join(root, 'release', `TomTrader-${version}-mac-${process.arch}.dmg`);
+    const dmg = path.join(releaseDirectory, `TomTrader-${version}-mac-${process.arch}.dmg`);
     await readFile(dmg); report.installerGenerated = true;
     mount = path.join(temporary, 'mount');
     execFileSync('hdiutil', ['attach', dmg, '-readonly', '-nobrowse', '-mountpoint', mount], { stdio: 'inherit' });
@@ -40,7 +42,7 @@ try {
     process.env.TOMTRADER_DESKTOP_EXECUTABLE = path.join(installation, 'Contents/MacOS/TomTrader');
     report.binary = execFileSync('file', [process.env.TOMTRADER_DESKTOP_EXECUTABLE], { encoding: 'utf8' }).trim().replace(temporary, '<isolated-install>');
   } else if (process.platform === 'win32') {
-    const installer = path.join(root, 'release', `TomTrader-${version}-win-x64.exe`);
+    const installer = path.join(releaseDirectory, `TomTrader-${version}-win-x64.exe`);
     await readFile(installer); report.installerGenerated = true;
     installation = path.join(temporary, 'installed');
     execFileSync(installer, ['/S', `/D=${installation}`], { timeout: 120_000, stdio: 'inherit' });
@@ -52,11 +54,11 @@ try {
     report.method = 'NSIS silent install → installed EXE → isolated profile, outside checkout';
   } else throw new Error('This native installer acceptance supports macOS and Windows only');
   execFileSync(process.execPath, ['tools/smoke-desktop.mjs'], {
-    cwd: root, env: { ...process.env, TOMTRADER_DESKTOP_REPORT_DIR: 'test-results/desktop/installed' }, stdio: 'inherit', timeout: 180_000,
+    cwd: root, env: { ...process.env, TOMTRADER_DESKTOP_REPORT_DIR: path.join(reportDirectory, 'installed') }, stdio: 'inherit', timeout: 180_000,
   });
   report.installedAppPassed = true;
 } finally {
-  await writeFile(path.join(root, 'test-results/desktop/install.json'), JSON.stringify(report, null, 2));
+  await writeFile(path.join(reportDirectory, 'install.json'), JSON.stringify(report, null, 2));
   if (mount) execFileSync('hdiutil', ['detach', mount]);
   if (process.platform === 'darwin' && installation) await writable(installation);
   if (process.platform === 'win32' && report.installerInstalled) {

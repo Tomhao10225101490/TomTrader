@@ -6,7 +6,7 @@ import os from 'node:os';
 if (process.env.TOMTRADER_PUBLIC_FEEDS !== '1') throw new Error('Explicit public-feed consent required');
 const executablePath = process.env.TOMTRADER_DESKTOP_EXECUTABLE;
 if (!executablePath || !path.isAbsolute(executablePath)) throw new Error('Use an independently installed absolute executable path');
-const reportDir = path.resolve('test-results/rc/real-installed');
+const reportDir = path.resolve(process.env.TOMTRADER_DESKTOP_REPORT_DIR || 'test-results/rc/real-installed');
 await mkdir(reportDir, { recursive: true });
 const profile = await mkdtemp(path.join(os.tmpdir(), 'TomTrader 真实行情 验收 '));
 let instance;

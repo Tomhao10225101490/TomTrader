@@ -123,6 +123,8 @@ interface HealthRecord {
 }
 
 const health = new Map<ProviderId, HealthRecord>();
+const operationHealth = new Map<string, HealthRecord>();
+const providerThrottle = new Map<ProviderId, { until: number; message: string }>();
 
 function healthOf(provider: ProviderId): HealthRecord {
   let h = health.get(provider);
@@ -158,36 +160,47 @@ async function callProvider<T>(
   fn: () => Promise<CapabilityResult<T>>,
 ): Promise<CapabilityResult<T>> {
   const h = healthOf(provider);
-  if (!h.ok && h.cooldownMs > 0 && h.lastAttemptAt && Date.now() - h.lastAttemptAt < h.cooldownMs) {
-    const remaining = h.cooldownMs - (Date.now() - h.lastAttemptAt);
-    // Record the reason even though this call never reached the network: the
-    // Settings panel must never show a provider as unhealthy without saying why.
-    h.lastError = `cooling down ${Math.ceil(remaining / 1000)}s after ${h.consecutiveErrors} failure(s) — ${h.lastError ?? 'no detail'}`;
-    return err('rate-limited', h.lastError, remaining);
+  const throttle = providerThrottle.get(provider);
+  if (throttle && throttle.until > Date.now()) return err('rate-limited', throttle.message, throttle.until - Date.now());
+  // Quote and history hosts can fail independently. A history socket failure
+  // must not disable working quotes; an explicit rate-limit still pauses the
+  // entire vendor conservatively and preserves its Retry-After.
+  const key = `${provider}:${op.split(':')[0]}`;
+  let gate = operationHealth.get(key);
+  if (!gate) {
+    gate = { ...h, ok: true, consecutiveErrors: 0, cooldownMs: 0, lastAttemptAt: null };
+    operationHealth.set(key, gate);
   }
-  h.lastAttemptAt = Date.now();
+  if (!gate.ok && gate.cooldownMs > 0 && gate.lastAttemptAt && Date.now() - gate.lastAttemptAt < gate.cooldownMs) {
+    const remaining = gate.cooldownMs - (Date.now() - gate.lastAttemptAt);
+    return err('rate-limited', `cooling down ${Math.ceil(remaining / 1000)}s after ${gate.lastError ?? 'provider failure'}`, remaining);
+  }
+  gate.lastAttemptAt = Date.now();
+  h.lastAttemptAt = gate.lastAttemptAt;
   const result = await fn().catch((e): CapabilityResult<T> => err('network', String((e as Error)?.message ?? e)));
   if (!result.ok && ['unsupported', 'not-found', 'no-key'].includes(result.reason)) {
     logProviderEvent(provider, op, result.reason, result.message);
     return result;
   }
   if (result.ok) {
-    h.ok = true;
-    h.lastSuccessAt = Date.now();
-    h.lastError = null;
-    h.consecutiveErrors = 0;
-    h.cooldownMs = 0;
+    gate.ok = true;
+    gate.lastSuccessAt = Date.now();
+    gate.lastError = null;
+    gate.consecutiveErrors = 0;
+    gate.cooldownMs = 0;
   } else {
-    h.consecutiveErrors += 1;
-    h.lastError = redact(`${result.reason}: ${result.message}`);
-    h.cooldownMs = Math.max(
+    gate.consecutiveErrors += 1;
+    gate.lastError = redact(`${result.reason}: ${result.message}`);
+    gate.cooldownMs = Math.max(
       result.retryAfterMs ?? 0,
       result.reason === 'rate-limited' ? 30_000 : 5_000,
-      Math.min(60_000 * h.consecutiveErrors, 5 * 60_000),
+      Math.min(60_000 * gate.consecutiveErrors, 5 * 60_000),
     );
-    h.ok = false;
+    gate.ok = false;
+    if (result.reason === 'rate-limited') providerThrottle.set(provider, { until: Date.now() + gate.cooldownMs, message: gate.lastError });
     logProviderEvent(provider, op, result.reason, result.message);
   }
+  Object.assign(h, gate);
   return result;
 }
 
@@ -509,6 +522,9 @@ export async function refreshQuotes(ids: string[], opts: { interactive?: boolean
       );
       for (const q of quotes.values()) {
         put('quote', q.instrumentId, q, tradingNow.has(q.instrumentId) ? quoteTtl(q, true) : quoteTtl(q, false), q.provider);
+        // A response that finishes after an HTTP budget expired is still a
+        // successful refresh; do not leave that obsolete timeout on the quote.
+        lastIssues.delete(q.instrumentId);
       }
       for (const listener of quoteRefreshListeners) { try { listener(); } catch { /* a client cannot fail vendor persistence */ } }
     }
@@ -530,6 +546,12 @@ export function venueInSessionWindow(exchange: ExchangeCode, nowMs: number): boo
     if (nowMs >= plan.segments[0].openAt && nowMs < plan.segments[plan.segments.length - 1].closeAt) return true;
   }
   return false;
+}
+
+/** A long overnight/lunch TTL must never suppress refresh after the venue reopens. */
+function quoteCacheIsFresh(entry: { value: Quote; storedAt: number; expiresAt: number }, instrument: Instrument, now: number): boolean {
+  const open = marketStatusFor(instrument.exchange, now).state === 'open';
+  return entry.expiresAt > now && now - entry.storedAt < quoteTtl(entry.value, open);
 }
 
 function quoteTtl(q: Quote, open: boolean): number {
@@ -573,7 +595,7 @@ export async function getSnapshots(ids: string[], opts: SnapshotOptions): Promis
       const instrument = resolveInstrument(id);
       if (!instrument) continue;
       const fresh = peek<Quote>('quote', id);
-      if (fresh && fresh.expiresAt > now) {
+      if (fresh && quoteCacheIsFresh(fresh, instrument, now)) {
         out.set(id, snapshotOf(instrument, fresh.value, now));
         continue;
       }
@@ -597,10 +619,17 @@ export async function getSnapshots(ids: string[], opts: SnapshotOptions): Promis
       for (const [id, issue] of value.issues) lastIssues.set(id, issue);
     }
 
-    if (needsNetwork.length && !inFlightStale.has(needsNetwork.join(','))) {
-      const group = needsNetwork.join(',');
+    // A successful first-run wait already populated the cache. Retry only
+    // outstanding IDs rather than immediately fetching the whole batch twice.
+    const pending = needsNetwork.filter((id) => {
+      const entry = peek<Quote>('quote', id);
+      const instrument = resolveInstrument(id);
+      return !(entry && instrument && quoteCacheIsFresh(entry, instrument, Date.now()));
+    });
+    if (pending.length && !inFlightStale.has(pending.join(','))) {
+      const group = pending.join(',');
       inFlightStale.add(group);
-      void refreshQuotes(needsNetwork)
+      void refreshQuotes(pending)
         .then((r) => {
           for (const [id, issue] of r.issues) lastIssues.set(id, issue);
           for (const q of r.quotes.values()) lastIssues.delete(q.instrumentId);
@@ -620,7 +649,8 @@ export async function getSnapshots(ids: string[], opts: SnapshotOptions): Promis
   // refresh keeps running behind it.
   const freshIds = ids.filter((id) => {
     const hit = peek<Quote>('quote', id);
-    return !(hit && hit.expiresAt > now);
+    const instrument = resolveInstrument(id);
+    return !(hit && instrument && quoteCacheIsFresh(hit, instrument, now));
   });
   if (freshIds.length) {
     const { value: r, timedOut } = await withDeadline(refreshQuotes(freshIds), opts.deadlineMs ?? 4_500, {
@@ -668,7 +698,7 @@ export async function getBars(
   const key = `${id}|${range}|${useInterval}`;
 
   const hit = peek<Bars>('bars', key);
-  if (hit && hit.expiresAt > Date.now() && hit.value.interval === useInterval) {
+  if (hit && hit.expiresAt > Date.now() && Date.now() - hit.storedAt < intradayTtl(useInterval, instrument) && hit.value.interval === useInterval) {
     // Guarded on the read path as well, because rows written before the unit
     // fix are still on disk and would keep drawing a 59th-century axis.
     return { bars: assertBarTimesAreSeconds(hit.value, hit.provider as never), issue: null };

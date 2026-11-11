@@ -72,6 +72,7 @@ const POLICIES: Record<string, HostPolicy> = {
   'push2his.eastmoney.com': { maxConcurrent: 1, minIntervalMs: 1_000, penaltyBaseMs: 30_000 },
   'open.er-api.com': { maxConcurrent: 1, minIntervalMs: 200, penaltyBaseMs: 5_000 },
   'fc.yahoo.com': { maxConcurrent: 1, minIntervalMs: 1_000, penaltyBaseMs: 3_000, penaltyCapMs: 8_000 },
+  'web.ifzq.gtimg.cn': { maxConcurrent: 1, minIntervalMs: 1_000, penaltyBaseMs: 30_000 },
   'qt.gtimg.cn': { maxConcurrent: 1, minIntervalMs: 1_000, penaltyBaseMs: 30_000 },
   'finnhub.io': { maxConcurrent: 1, minIntervalMs: 2_100, penaltyBaseMs: 60_000, penaltyCapMs: 60_000 },
   default: { maxConcurrent: 2, minIntervalMs: 200, penaltyBaseMs: 3_000, penaltyCapMs: 12_000 },

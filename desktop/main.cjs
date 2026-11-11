@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { randomUUID } = require('node:crypto');
-const { reservePort, serverEnvironment, isInternalUrl, isExternalUrl } = require('./runtime.cjs');
+const { reservePort, serverEnvironment, isInternalUrl, isExternalUrl, isProtectedBackupPath, writeBackup } = require('./runtime.cjs');
 const { readSettings, saveSettings, createCredentialStore } = require('./credentials.cjs');
 
 const smoke = process.argv.includes('--smoke-test');
@@ -189,9 +189,10 @@ async function verify() {
 async function backup() {
   const { canceled, filePath } = await dialog.showSaveDialog(window, { title: 'Back up local database / 备份本地数据', defaultPath: `TomTrader-${mode}-${new Date().toISOString().slice(0, 10)}.db`, filters: [{ name: 'SQLite backup', extensions: ['db'] }] });
   if (canceled || !filePath) return { ok: false, canceled: true };
+  if (isProtectedBackupPath(filePath, profile)) throw new Error('Choose a backup destination outside the running TomTrader profile. / 请选择应用数据目录以外的备份位置。');
   const response = await internalFetch('/api/backup', { method: 'POST' });
   if (!response.ok) throw new Error('Backup failed; original database was not modified.');
-  fs.writeFileSync(filePath, Buffer.from(await response.arrayBuffer()), { mode: 0o600 });
+  writeBackup(filePath, Buffer.from(await response.arrayBuffer()));
   return { ok: true }; // Do not leak filesystem paths to the market window.
 }
 function installIPC() {
@@ -237,7 +238,10 @@ function installMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     ...(process.platform === 'darwin' ? [{ role: 'appMenu' }] : []),
     { label: 'File', submenu: [
-      { label: 'Back up database…', click: () => { void backup().catch(recover); } },
+      { label: 'Back up database…', click: () => { void backup().catch(async (error) => {
+        log(`Backup failed: ${error.message}`);
+        await dialog.showMessageBox(window, { type: 'error', title: 'TomTrader · Backup failed / 备份失败', message: 'The backup could not be saved. / 无法保存备份', detail: 'Your local database and previous backup have not been replaced. Choose a destination outside the running app profile and check its permissions/free space, then try again. / 原始数据库与已有备份未被替换，请选择应用数据目录以外的位置，并检查目标权限和剩余空间。' });
+      }); } },
       { label: 'Open data folder', click: () => { void shell.openPath(path.join(profile, 'data')); } },
       { label: 'Open redacted log folder', click: () => { void shell.openPath(app.getPath('logs')); } },
       { type: 'separator' }, { role: 'quit' },
@@ -258,7 +262,11 @@ function installMenu() {
 }
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
-  app.on('second-instance', () => { const target = window ?? configuration; if (target) { if (target.isMinimized()) target.restore(); target.show(); target.focus(); } });
+  app.on('second-instance', () => {
+    const target = window ?? configuration;
+    if (target) { if (target.isMinimized()) target.restore(); target.show(); target.focus(); }
+    else if (app.isReady()) { if (origin) createWindow(); else openConfiguration(); }
+  });
   app.whenReady().then(async () => {
     fs.mkdirSync(profile, { recursive: true });
     app.setAppLogsPath(path.join(profile, 'logs'));

@@ -2,7 +2,7 @@
 import { Picker } from '@/app/(app)/watchlist/page';
 import { Block,Page } from '@/components/Page';
 import { ChangeText,displayName,PriceText } from '@/components/quote';
-import { Button,EmptyState,Field,Modal,Segmented,SelectInput,TextInput } from '@/components/ui';
+import { Button,EmptyState,ErrorState,Field,Modal,Segmented,SelectInput,TextInput } from '@/components/ui';
 import { api } from '@/lib/api';
 import { resolveInstrument } from '@/lib/clientInstruments';
 import { formatClock,formatPercent,formatPrice } from '@/lib/format';
@@ -28,6 +28,7 @@ const CONDITION_TYPES: AlertCondition['type'][] = ['price-above', 'price-below',
  */
 export default function AlertsPage() {
   const { t, locale, zoneOf } = useI18n();
+  const error = useUserData((s) => s.error);
   const alerts = useUserData((s) => s.alerts);
   const alertIds = alerts.filter((a) => a.enabled).map((a) => a.instrumentId);
   useInterest(alertIds);
@@ -95,6 +96,7 @@ export default function AlertsPage() {
         </>
       }
     >
+      {error ? <ErrorState title={error} onRetry={() => void load()} /> : null}
       {permission === 'denied' ? <p className="text-[11.5px] text-[var(--t-warn)]">{t('alerts.notificationsBlocked')}</p> : null}
 
       <Block flush title={t('alerts.title')} subtitle={`${alerts.length}`}>

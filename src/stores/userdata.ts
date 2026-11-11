@@ -27,8 +27,8 @@ interface UserDataState {
   removeSymbol: (groupId: string, instrumentId: string) => Promise<void>;
   reorder: (groupId: string, ids: string[]) => Promise<void>;
   togglePin: (groupId: string, instrumentId: string) => Promise<void>;
-  createGroup: (name: string) => Promise<void>;
-  renameGroup: (id: string, name: string) => Promise<void>;
+  createGroup: (name: string) => Promise<boolean>;
+  renameGroup: (id: string, name: string) => Promise<boolean>;
   deleteGroup: (id: string) => Promise<void>;
   loadAlerts: () => Promise<void>;
   createAlert: (input: { instrumentId: string; condition: PriceAlert['condition']; cooldownMinutes?: number }) => Promise<string | null>;
@@ -75,7 +75,7 @@ export const useUserData = create<UserDataState>((set, get) => ({
     const optimistic = before.map((g) =>
       g.id === groupId && !g.instrumentIds.includes(instrumentId) ? { ...g, instrumentIds: [...g.instrumentIds, instrumentId] } : g,
     );
-    set({ groups: optimistic });
+    set({ groups: optimistic, error: null });
     const res = await api.watchlist.post({ op: 'add', groupId, instrumentId });
     if (res.error) {
       set({ groups: before, error: res.error });
@@ -88,6 +88,7 @@ export const useUserData = create<UserDataState>((set, get) => ({
   removeSymbol: async (groupId, instrumentId) => {
     const before = get().groups;
     set({
+      error: null,
       groups: before.map((g) =>
         g.id === groupId ? { ...g, instrumentIds: g.instrumentIds.filter((i) => i !== instrumentId), pinned: g.pinned.filter((i) => i !== instrumentId) } : g,
       ),
@@ -98,58 +99,70 @@ export const useUserData = create<UserDataState>((set, get) => ({
 
   reorder: async (groupId, ids) => {
     const before = get().groups;
-    set({ groups: before.map((g) => (g.id === groupId ? { ...g, instrumentIds: ids } : g)) });
+    set({ groups: before.map((g) => (g.id === groupId ? { ...g, instrumentIds: ids } : g)), error: null });
     const res = await api.watchlist.post({ op: 'reorder', groupId, ids });
     if (res.error) set({ groups: before, error: res.error });
   },
 
   togglePin: async (groupId, instrumentId) => {
-    await api.watchlist.post({ op: 'pin', groupId, instrumentId });
+    set({ error: null });
+    const res = await api.watchlist.post({ op: 'pin', groupId, instrumentId });
+    if (res.error) { set({ error: res.error }); return; }
     await get().load();
   },
 
   createGroup: async (name) => {
-    await api.watchlist.post({ op: 'create', name });
+    set({ error: null });
+    const res = await api.watchlist.post({ op: 'create', name });
+    if (res.error) { set({ error: res.error }); return false; }
     await get().load();
+    return true;
   },
 
   renameGroup: async (id, name) => {
-    await api.watchlist.post({ op: 'rename', groupId: id, name });
+    set({ error: null });
+    const res = await api.watchlist.post({ op: 'rename', groupId: id, name });
+    if (res.error) { set({ error: res.error }); return false; }
     await get().load();
+    return true;
   },
 
   deleteGroup: async (id) => {
-    await api.watchlist.post({ op: 'delete', groupId: id });
+    set({ error: null });
+    const res = await api.watchlist.post({ op: 'delete', groupId: id });
+    if (res.error) { set({ error: res.error }); return; }
     await get().load();
   },
 
   loadAlerts: async () => {
     const res = await api.alerts.get();
+    if (res.error || !res.data) { set({ error: res.error ?? 'alerts request failed' }); return; }
     if (res.data) {
       const { alerts, events } = res.data as { alerts: PriceAlert[]; events: AlertEvent[] };
-      set({ alerts, alertEvents: events });
+      set({ alerts, alertEvents: events, error: null });
     }
   },
 
   createAlert: async (input) => {
+    set({ error: null });
     const res = await api.alerts.post({ op: 'create', ...input });
-    if (res.error) return res.error;
+    if (res.error) { set({ error: res.error }); return res.error; }
     await get().loadAlerts();
     return null;
   },
 
   toggleAlert: async (id, enabled) => {
     const before = get().alerts;
-    set({ alerts: before.map((a) => (a.id === id ? { ...a, enabled } : a)) });
+    set({ alerts: before.map((a) => (a.id === id ? { ...a, enabled } : a)), error: null });
     const res = await api.alerts.post({ op: 'toggle', id, enabled });
-    if (res.error) set({ alerts: before });
+    if (res.error) set({ alerts: before, error: res.error });
     else await get().loadAlerts();
   },
 
   deleteAlert: async (id) => {
     const before = get().alerts;
-    set({ alerts: before.filter((a) => a.id !== id) });
+    set({ alerts: before.filter((a) => a.id !== id), error: null });
     const res = await api.alerts.post({ op: 'delete', id });
-    if (res.error) set({ alerts: before });
+    if (res.error) set({ alerts: before, error: res.error });
   },
 }));

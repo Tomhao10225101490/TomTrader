@@ -53,6 +53,10 @@ Measured on 2026-11-08 against a fresh in-memory database (curated universe, not
 
 **Latency is labeled "unverified" everywhere.** The public endpoints make no verifiable latency promise, so the app never claims "real-time" or a fixed 15-minute delay. The pipeline is bounded server-side REST polling → browser SSE; the "connected" indicator describes the transport, not exchange-grade streaming. Public web sources can be rate-limited or change without notice — see [KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) and [DATA_ACCURACY.md](docs/DATA_ACCURACY.md).
 
+## Local Mac repair build — 2026-11-11
+
+Current source version is **1.0.1-rc.2**. This repair pass addresses subscription loss during navigation, stale results replacing newer quotes, market-open cache transitions, incorrectly relabelled chart ranges, portfolio/import consistency, failed user actions, and safe native backup/window recovery. Follow [the current repair checkpoint](docs/NIGHT_CHECKPOINT.md) for verified results and the new local installer path. The prior RC1 hashes remain historical evidence; they do not include these repairs.
+
 ## Desktop application (macOS / Windows)
 
 TomTrader now includes an Electron desktop shell and native installer build pipeline. End users can install a **macOS DMG** (Apple Silicon or Intel) or **Windows x64 EXE** without installing Node.js or running a web server themselves. Installers are available from [GitHub Releases](https://github.com/Tomhao10225101490/TomTrader/releases) once a desktop release is published; adding this pipeline does not itself publish a release.
@@ -105,7 +109,7 @@ All configuration is server-side environment (never `NEXT_PUBLIC_` for credentia
 
 | Variable | Meaning |
 |---|---|
-| `TOMTRADER_DATA_MODE` | `personal` enables the keyless public-feed adapters for local use |
+| `TOMTRADER_DATA_MODE` | Labels local personal mode; public adapters additionally require `TOMTRADER_PUBLIC_FEEDS=1` |
 | `TOMTRADER_PUBLIC_FEEDS` | `1` turns the public feeds on |
 | `TOMTRADER_DEMO` | `1` forces synthetic demo mode with its own database |
 | `FINNHUB_API_KEY` | Optional official US-data adapter key (not required) |

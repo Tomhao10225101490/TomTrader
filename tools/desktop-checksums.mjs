@@ -4,7 +4,7 @@ import { createReadStream } from 'node:fs';
 import { readdir, writeFile, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 
-const directory = path.resolve('release');
+const directory = path.resolve(process.env.TOMTRADER_RELEASE_DIR || 'release');
 const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 const files = (await readdir(directory)).filter((name) => name.startsWith(`TomTrader-${pkg.version}-`) && /\.(dmg|zip|exe)$/.test(name)).sort();
 if (!files.length) throw new Error('No desktop installers found in release/');
@@ -21,7 +21,8 @@ for (const name of files) {
 const manifest = `SHA256SUMS-${process.platform}-${process.arch}.txt`;
 await writeFile(path.join(directory, manifest), `${lines.join('\n')}\n`);
 let installedAcceptance = null;
-try { installedAcceptance = JSON.parse(await readFile('test-results/desktop/install.json', 'utf8')); } catch { /* No installed acceptance is not a pass. */ }
+try { installedAcceptance = JSON.parse(await readFile(path.join(process.env.TOMTRADER_DESKTOP_REPORT_DIR || 'test-results/desktop', 'install.json'), 'utf8')); } catch { /* No installed acceptance is not a pass. */ }
+if (installedAcceptance && installedAcceptance.version !== pkg.version) throw new Error('Installed acceptance version does not match this build');
 let signing = { status: 'unverified' };
 if (process.platform === 'darwin') {
   const bundle = path.join(directory, process.arch === 'arm64' ? 'mac-arm64' : 'mac', 'TomTrader.app');

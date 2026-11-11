@@ -45,6 +45,9 @@ let slowTimer: ReturnType<typeof setInterval> | null = null;
 let policy: 'auto' | 'slow' | 'off' = 'auto';
 let booted = false;
 let pendingFlush: ReturnType<typeof setTimeout> | null = null;
+let suspended = false;
+let catchUpGeneration = 0;
+let catchUpController: AbortController | null = null;
 
 export const useLive = create<LiveState>((set, get) => ({
   snapshots: {},
@@ -58,7 +61,11 @@ export const useLive = create<LiveState>((set, get) => ({
   primeSnapshots: (snapshots) =>
     set((state) => {
       const next = { ...state.snapshots };
-      for (const s of snapshots) next[s.instrument.id] = s;
+      for (const s of snapshots) {
+        const before = next[s.instrument.id];
+        if (before?.quote && (!s.quote || before.quote.receivedAt > s.quote.receivedAt)) continue;
+        next[s.instrument.id] = { ...s, sparkline: s.sparkline ?? before?.sparkline };
+      }
       return { snapshots: next };
     }),
 
@@ -73,19 +80,24 @@ export const useLive = create<LiveState>((set, get) => ({
   },
 
   interest: (ids) => {
-    const refs = get().refs;
-    for (const id of ids) refs.set(id, (refs.get(id) ?? 0) + 1);
-    set({ refs: new Map(refs) });
+    const wanted = [...new Set(ids)];
+    const refs = new Map(get().refs);
+    for (const id of wanted) refs.set(id, (refs.get(id) ?? 0) + 1);
+    set({ refs });
     flushSubscriptions();
-    if (policy === 'slow') void catchUp();
+    if (booted && policy === 'slow') void catchUp();
 
+    let released = false;
     return () => {
-      for (const id of ids) {
+      if (released) return;
+      released = true;
+      const refs = new Map(get().refs);
+      for (const id of wanted) {
         const count = (refs.get(id) ?? 1) - 1;
         if (count <= 0) refs.delete(id);
         else refs.set(id, count);
       }
-      set({ refs: new Map(refs) });
+      set({ refs });
       flushSubscriptions();
     };
   },
@@ -93,6 +105,8 @@ export const useLive = create<LiveState>((set, get) => ({
   setRefreshPolicy: (next) => {
     if (policy === next && booted && (source || slowTimer || next === 'off')) return;
     policy = next;
+    cancelCatchUp();
+    if (!booted) return;
     stopWatchdog();
     if (backoffTimer) clearTimeout(backoffTimer);
     backoffTimer = null;
@@ -109,9 +123,7 @@ export const useLive = create<LiveState>((set, get) => ({
       return;
     }
     if (next === 'slow') {
-      set({ connection: 'open' });
-      void catchUp();
-      slowTimer = setInterval(() => { if (!document.hidden) void catchUp(); }, 60_000);
+      startSlowPoll();
       return;
     }
     connect();
@@ -120,19 +132,19 @@ export const useLive = create<LiveState>((set, get) => ({
 
 function ensureClientId(): void {
   if (clientId) return;
-  if (typeof sessionStorage !== 'undefined') {
-    const stored = sessionStorage.getItem('tomtrader.client');
-    if (stored) {
-      clientId = stored;
-      return;
-    }
-  }
+  // sessionStorage is cloned when a browser tab is duplicated. Reusing that
+  // stored id would make two tabs replace/detach each other's server client.
   clientId = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `c${Math.random().toString(36).slice(2)}`;
-  try {
-    sessionStorage?.setItem('tomtrader.client', clientId);
-  } catch {
-    /* private mode */
-  }
+}
+
+function canRefresh(): boolean {
+  return booted && !suspended && !document.hidden && (typeof navigator === 'undefined' || navigator.onLine !== false);
+}
+
+function cancelCatchUp(): void {
+  catchUpGeneration++;
+  catchUpController?.abort();
+  catchUpController = null;
 }
 
 function activeIds(): string[] {
@@ -145,7 +157,7 @@ function flushSubscriptions(): void {
   pendingFlush = setTimeout(() => {
     pendingFlush = null;
     const ids = activeIds();
-    if (policy !== 'auto') return;
+    if (policy !== 'auto' || !canRefresh()) return;
     void fetch('/api/stream/state', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -156,6 +168,10 @@ function flushSubscriptions(): void {
 
 function connect(): void {
   if (typeof window === 'undefined') return;
+  if (policy !== 'auto' || !canRefresh()) {
+    useLive.setState({ connection: policy === 'off' || document.hidden ? 'paused' : 'offline' });
+    return;
+  }
   const ids = activeIds();
   useLive.setState({ connection: 'connecting' });
   const url = `/api/stream?client=${encodeURIComponent(clientId)}&ids=${encodeURIComponent(ids.join(','))}`;
@@ -170,12 +186,12 @@ function connect(): void {
   const stream = source;
   source.onopen = () => {
     if (source !== stream) return;
-    useLive.setState({ connection: 'open', attempt: 0, lastError: null });
+    useLive.setState({ connection: 'open', attempt: 0, lastError: null, lastFrameAt: Date.now() });
     startWatchdog();
   };
 
   source.onmessage = (event) => {
-    if (source !== stream) return;
+    if (source !== stream || !canRefresh()) return;
     useLive.setState({ lastFrameAt: Date.now(), connection: 'open' });
     let frame: SseFrame;
     try {
@@ -184,11 +200,7 @@ function connect(): void {
       return;
     }
     if (frame.type === 'quotes' && frame.quotes) {
-      useLive.setState((state) => {
-        const next = { ...state.snapshots };
-        for (const s of frame.quotes!) next[s.instrument.id] = s;
-        return { snapshots: next };
-      });
+      useLive.getState().primeSnapshots(frame.quotes);
     } else if (frame.type === 'alert' && frame.alerts) {
       useLive.setState((state) => ({ alerts: [...frame.alerts!, ...state.alerts].slice(0, 40) }));
       void showNotification(frame.alerts);
@@ -214,7 +226,7 @@ function scheduleBackoff(): void {
   const delay = Math.min(15_000, 1_000 * 2 ** (attempt - 1)) + Math.random() * 400;
   if (backoffTimer) clearTimeout(backoffTimer);
   backoffTimer = setTimeout(() => {
-    if (policy === 'auto' && !document.hidden) connect();
+    if (policy === 'auto' && canRefresh()) connect();
     else useLive.setState({ connection: document.hidden ? 'paused' : 'offline' });
   }, delay);
 }
@@ -242,6 +254,7 @@ function stopWatchdog(): void {
 function attachVisibility(): void {
   if (typeof document === 'undefined') return;
   const pause = () => {
+    cancelCatchUp();
     source?.close();
     source = null;
     stopWatchdog();
@@ -249,60 +262,65 @@ function attachVisibility(): void {
     backoffTimer = null;
     if (slowTimer) clearInterval(slowTimer);
     slowTimer = null;
-    useLive.setState({ connection: 'offline' });
+    useLive.setState({ connection: policy === 'off' || document.hidden ? 'paused' : 'offline' });
   };
   const resume = () => {
     pause();
-    if (policy === 'auto' && !document.hidden) connect();
+    if (!canRefresh()) return;
+    if (policy === 'auto') { connect(); void catchUp(); }
     else if (policy === 'slow') startSlowPoll();
     else useLive.setState({ connection: 'paused' });
-    if (policy !== 'off') void catchUp();
   };
   window.addEventListener('offline', pause);
   window.addEventListener('online', resume);
-  window.addEventListener('tomtrader:suspend', pause);
-  window.addEventListener('tomtrader:resume', resume);
+  window.addEventListener('tomtrader:suspend', () => { suspended = true; pause(); });
+  window.addEventListener('tomtrader:resume', () => { suspended = false; resume(); });
   document.addEventListener('visibilitychange', () => {
-    if (policy !== 'auto') return;
-    if (document.hidden) {
-      void fetch('/api/stream/state', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ client: clientId, paused: true }),
-      }).catch(() => undefined);
-      useLive.setState({ connection: 'paused' });
-    } else {
-      void fetch('/api/stream/state', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ client: clientId, paused: false, ids: activeIds() }),
-      }).catch(() => undefined);
-      if (!source) connect();
-      else useLive.setState({ connection: 'open' });
-      void catchUp();
-    }
+    if (document.hidden) pause();
+    else resume();
   });
 }
 
 /** REST catch-up used after a background tab returns, and by the slow policy. */
 async function catchUp(): Promise<void> {
+  if (policy === 'off' || !canRefresh()) return;
   const ids = activeIds();
   if (!ids.length) return;
+  cancelCatchUp();
+  const generation = catchUpGeneration;
+  const ac = new AbortController();
+  catchUpController = ac;
+  const timer = setTimeout(() => ac.abort(), 20_000);
   try {
-    const res = await fetch(`/api/quotes?ids=${encodeURIComponent(ids.join(','))}`, { cache: 'no-store' });
-    if (!res.ok) return;
+    const res = await fetch(`/api/quotes?ids=${encodeURIComponent(ids.join(','))}`, { cache: 'no-store', signal: ac.signal });
+    if (!res.ok) { slowPollState(generation, `HTTP ${res.status} refreshing quotes`); return; }
     const data = (await res.json()) as { snapshots: QuoteSnapshot[] };
+    if (generation !== catchUpGeneration || !canRefresh()) return;
     useLive.getState().primeSnapshots(data.snapshots ?? []);
+    slowPollState(generation, null);
   } catch {
-    /* the stream will bring data when it returns */
+    slowPollState(generation, 'quote refresh failed');
+    /* the stream or next bounded poll will retry when connectivity returns */
+  } finally {
+    clearTimeout(timer);
+    if (catchUpController === ac) catchUpController = null;
   }
+}
+
+function slowPollState(generation: number, error: string | null): void {
+  if (generation !== catchUpGeneration || policy !== 'slow' || !canRefresh()) return;
+  useLive.setState(error ? { connection: 'backoff', lastError: error } : { connection: 'open', lastError: null, lastFrameAt: Date.now() });
 }
 
 function startSlowPoll(): void {
   if (slowTimer) clearInterval(slowTimer);
-  useLive.setState({ connection: 'open' });
+  if (!canRefresh()) {
+    useLive.setState({ connection: document.hidden ? 'paused' : 'offline' });
+    return;
+  }
+  useLive.setState({ connection: 'connecting' });
   void catchUp();
-  slowTimer = setInterval(() => { if (!document.hidden) void catchUp(); }, 60_000);
+  slowTimer = setInterval(() => { if (canRefresh()) void catchUp(); }, 60_000);
 }
 
 async function showNotification(alerts: SseFrame['alerts']): Promise<void> {

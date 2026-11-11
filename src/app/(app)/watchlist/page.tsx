@@ -377,6 +377,8 @@ function NewGroupButton() {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
+  const [busy, setBusy] = useState(false);
+  const error = useUserData((s) => s.error);
   const create = useUserData((s) => s.createGroup);
   return (
     <>
@@ -393,11 +395,13 @@ function NewGroupButton() {
             <Button
               size="sm"
               variant="primary"
+              disabled={busy}
               onClick={async () => {
                 if (!name.trim()) return;
-                await create(name.trim());
-                setName('');
-                setOpen(false);
+                setBusy(true);
+                const ok = await create(name.trim());
+                setBusy(false);
+                if (ok) { setName(''); setOpen(false); }
               }}
             >
               {t('common.save')}
@@ -414,6 +418,7 @@ function NewGroupButton() {
             className="h-[30px] rounded-[var(--t-radius-sm)] border border-line bg-surface px-2 text-[13px] outline-none focus:border-accent"
           />
         </label>
+        {error ? <p role="alert" className="mt-2 text-[12px] text-[var(--t-down)]">{error}</p> : null}
       </Modal>
     </>
   );
@@ -421,6 +426,8 @@ function NewGroupButton() {
 
 function GroupActions({ group }: { group: WatchlistGroup }) {
   const { t } = useI18n();
+  const [busy, setBusy] = useState(false);
+  const error = useUserData((s) => s.error);
   const rename = useUserData((s) => s.renameGroup);
   const del = useUserData((s) => s.deleteGroup);
   const [open, setOpen] = useState(false);
@@ -452,9 +459,12 @@ function GroupActions({ group }: { group: WatchlistGroup }) {
             <Button
               size="sm"
               variant="primary"
+              disabled={busy}
               onClick={async () => {
-                await rename(group.id, name);
-                setOpen(false);
+                setBusy(true);
+                const ok = await rename(group.id, name);
+                setBusy(false);
+                if (ok) setOpen(false);
               }}
             >
               {t('common.save')}
@@ -468,6 +478,7 @@ function GroupActions({ group }: { group: WatchlistGroup }) {
           onChange={(e) => setName(e.target.value)}
           className="h-[30px] w-full rounded-[var(--t-radius-sm)] border border-line bg-surface px-2 text-[13px] outline-none focus:border-accent"
         />
+        {error ? <p role="alert" className="mt-2 text-[12px] text-[var(--t-down)]">{error}</p> : null}
       </Modal>
     </>
   );
