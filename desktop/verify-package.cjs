@@ -1,4 +1,5 @@
 const fs = require('node:fs');
+const { execFileSync } = require('node:child_process');
 const path = require('node:path');
 
 module.exports = async function verifyPackage(context) {
@@ -36,4 +37,14 @@ module.exports = async function verifyPackage(context) {
   }
   inspect(server);
   fs.writeFileSync(path.join(resources, 'package-integrity.json'), JSON.stringify({ runtimeFiles: files, nativeFiles, platform: context.electronPlatformName, arch: context.arch, checked: true }, null, 2));
+  if (context.electronPlatformName === 'darwin' && !process.env.CSC_LINK && !process.env.CSC_NAME) {
+    // Electron's linker-only ad-hoc signature does not seal the renamed app's
+    // resources. Seal this local preview without a certificate or OS policy
+    // change. Preserve existing entitlements/flags; do not add security bypasses.
+    // A later real builder signing step, if configured, replaces this seal.
+    const bundle = path.join(context.appOutDir, 'TomTrader.app');
+    execFileSync('/usr/bin/codesign', ['--force', '--deep', '--sign', '-', '--preserve-metadata=entitlements,flags', '--timestamp=none', bundle], { stdio: 'pipe' });
+    execFileSync('/usr/bin/codesign', ['--verify', '--deep', '--strict', bundle], { stdio: 'pipe' });
+    console.log('Local preview resource seal verified (ad-hoc only; no Developer ID/notarization claim).');
+  }
 };

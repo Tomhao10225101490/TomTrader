@@ -27,7 +27,9 @@ if (process.platform === 'darwin') {
   const bundle = path.join(directory, process.arch === 'arm64' ? 'mac-arm64' : 'mac', 'TomTrader.app');
   const result = spawnSync('codesign', ['-dv', '--verbose=4', bundle], { encoding: 'utf8' });
   const description = `${result.stdout}${result.stderr}`;
-  signing = { status: result.status !== 0 ? 'unsigned' : /Signature=adhoc/.test(description) ? 'ad-hoc' : 'signed',
+  const integrityVerified = spawnSync('codesign', ['--verify', '--deep', '--strict', bundle]).status === 0;
+  if (!integrityVerified) throw new Error('Refusing final manifest: macOS resource signature verification failed');
+  signing = { status: result.status !== 0 ? 'unsigned' : /Signature=adhoc/.test(description) ? 'ad-hoc' : 'signed', integrityVerified,
     notarization: spawnSync('xcrun', ['stapler', 'validate', bundle]).status === 0 ? 'staple-validated' : 'not-stapled' };
 } else if (process.platform === 'win32') {
   const executable = path.join(directory, artifacts.find((item) => item.filename.endsWith('.exe')).filename).replaceAll("'", "''");

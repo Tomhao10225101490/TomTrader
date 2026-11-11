@@ -35,6 +35,8 @@ try {
     report.installerInstalled = true;
     report.method = 'DMG → independent install directory → eject DMG → read-only resources → launch outside checkout';
     await readonly(installation);
+    execFileSync('/usr/bin/codesign', ['--verify', '--deep', '--strict', installation], { stdio: 'pipe' });
+    report.signatureIntegrityVerified = true;
     process.env.TOMTRADER_DESKTOP_EXECUTABLE = path.join(installation, 'Contents/MacOS/TomTrader');
     report.binary = execFileSync('file', [process.env.TOMTRADER_DESKTOP_EXECUTABLE], { encoding: 'utf8' }).trim().replace(temporary, '<isolated-install>');
   } else if (process.platform === 'win32') {

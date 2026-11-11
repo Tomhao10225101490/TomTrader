@@ -23,7 +23,7 @@ Target: **1.0.1-rc.1**, Apple Silicon, macOS 15.1 (24B2083). This round does not
 - [ ] Optional stronger checkout-denial sandbox: attempted, OS refuses nested Chromium sandbox initialization; **blocked, not passed**. Normal Electron sandbox remains enabled. Independent install/resource-resolution checks pass without lowering security.
 - [ ] Physical sleep/wake, whole-system offline switch, OS reboot and multi-day resource testing: not performed; injected events and ten-minute soak are labeled accurately.
 - [ ] Real Finnhub account: no personal key supplied. Header/401/403/429/no-fake-fallback fixtures passed; official-only mode does not provide historical bars.
-- [ ] Signing/notarization: no available identity/credentials. Local unsigned preview only; no security bypass or certificate purchase.
+- [ ] Signing/notarization: no available identity/credentials. Local ad-hoc preview only: full resource seal and strict integrity verification are required, but no Developer ID/notarization is claimed. No security bypass or certificate purchase.
 - [ ] Windows/Intel/native CI: deferred; no completion claims. No public release or default-branch merge.
 
 Final artifact sizes, hashes, source provenance and evidence links: **`FINAL_HANDOFF.md`**. Any final rebuilt bytes must be reinstalled and rechecked before their hashes are delivered.
